@@ -5,16 +5,20 @@ import React from 'react';
 
 const navBar = () => {
   return (
-    <header className='bg-palette-5 flex flex-row gap-5 p-5'>
+    <header className='bg-palette-5 flex flex-row gap-5 p-5 md:gap-8 md:p-8 items-center justify-around'>
       <Link 
         href='/'
-        className='text-palette-3 font-bold'
+        className='text-palette-3 font-bold md:text-xl'
       >
         LookBook
       </Link>
-
-      <h1 className='text-palette-3'>Saved Outfits</h1>
-      <h1>Theme Dark or light</h1>
+      <Link
+        href='/outfits'
+        className='text-palette-3 font-bold md:text-xl'
+      >
+        Saved Outfits
+      </Link>
+      <h1>Theme</h1>
     </header>
   );
 };
