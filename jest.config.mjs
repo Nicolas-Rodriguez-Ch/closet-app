@@ -17,6 +17,19 @@ const config = {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1',
   },
+  collectCoverageFrom: [
+    '**/*.{js,jsx,ts,tsx}',
+    '!**/*.d.ts',
+    '!**/node_modules/**',
+    '!**/.next/**',
+    '!**/database/models/**',
+    '!**/public/**',
+    '!**/styles/**',
+    '!**/__mocks__/**',
+    '!**/jest.*.js',
+    '!**/*.config.*',
+  ],
+  coveragePathIgnorePatterns: ['/node_modules/', '/coverage/'],
 };
 
 export default createJestConfig(config);
