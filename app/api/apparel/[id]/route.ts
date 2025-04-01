@@ -15,7 +15,7 @@ export async function GET(request: NextRequest, { params }: Params) {
 
     if (!apparel) {
       return NextResponse.json(
-        { message: `Apparel with ID ${id} not fouind` },
+        { message: `Apparel with ID ${id} not found` },
         { status: 404 }
       );
     }
@@ -25,7 +25,7 @@ export async function GET(request: NextRequest, { params }: Params) {
     console.error(`Error fetching apparel with ID ${params.id}:`, error);
     return NextResponse.json(
       {
-        message: 'Failed to fetch Apparel item',
+        message: 'Failed to fetch apparel item',
       },
       { status: 500 }
     );
@@ -54,7 +54,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
   } catch (error) {
     console.error(`Error updating apparel with ID ${params.id}:`, error);
     return NextResponse.json(
-      { message: 'Failed to update Apparel item' },
+      { message: 'Failed to update apparel item' },
       { status: 500 }
     );
   }
