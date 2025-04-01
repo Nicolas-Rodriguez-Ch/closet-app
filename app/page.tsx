@@ -1,8 +1,5 @@
-import { API_URL } from '@/public/constants/secrets';
-
-export default async function Home() {
-  const response = await fetch(`${API_URL}apparel`);
-  console.log('Esto es response: ', response.status);
+export default function Home() {
+  console.log('im i in the client or the server?');
   return (
     <article>
       <h1 className='bg-palette-1 text-palette-3'>Esto es home</h1>{' '}
