@@ -28,6 +28,7 @@ const config = {
     '!**/__mocks__/**',
     '!**/jest.*.js',
     '!**/*.config.*',
+    '!app/layout.tsx'
   ],
   coveragePathIgnorePatterns: ['/node_modules/', '/coverage/'],
 };
