@@ -1,4 +1,4 @@
-import { DATABASE_URI } from '@/public/constants/secrets';
+import { DATABASE_URI } from '../public/constants/secrets';
 import mongoose from 'mongoose';
 
 const connectDB = () => {
