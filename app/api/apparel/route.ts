@@ -11,10 +11,42 @@ export async function GET() {
       );
     }
     return NextResponse.json(apparels, { status: 200 });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error fetching apparel', error);
     return NextResponse.json(
       { message: 'Failed to fetch apparel items' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+
+    if (!body.title || !body.pictureURL || !body.type) {
+      return NextResponse.json(
+        {
+          message:
+            'Missing required fields: title, pictureURL, and type are required',
+        },
+        { status: 400 }
+      );
+    }
+
+    if (!['TOP', 'BOTTOM', 'SHOES'].includes(body.type)) {
+      return NextResponse.json(
+        { message: 'Invalid apparel type. Must be TOP, BOTTOM, or SHOES' },
+        { status: 400 }
+      );
+    }
+
+    const newApparel = await Apparel.create(body);
+    return NextResponse.json(newApparel, { status: 201 });
+  } catch (error) {
+    console.error('Error creating apparel item: ', error);
+    return NextResponse.json(
+      { message: 'Failed to create Apparel item' },
       { status: 500 }
     );
   }

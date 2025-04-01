@@ -1,5 +1,7 @@
+import { API_URL } from '@/public/constants/secrets';
+
 export default async function Home() {
-  const response = await fetch('http://localhost:3000/api/apparel');
+  const response = await fetch(`${API_URL}apparel`);
   console.log('Esto es response: ', response.status);
   return (
     <article>
