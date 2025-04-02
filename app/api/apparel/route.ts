@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
-    const apparels = await Apparel.find({}).sort({ createdAt: -1 });
+    const apparels = await Apparel.find({}).sort({ updatedAt: -1 });
     if (!apparels.length) {
       return NextResponse.json(
         { message: 'No apparel items were found', data: [] },

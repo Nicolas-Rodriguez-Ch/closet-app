@@ -6,7 +6,7 @@ export interface IApparel extends Document {
   pictureURL: string;
   title: string;
   description?: string;
-  type: 'TOP' | 'BOTTOM' | 'SHOES';
+  type: 'TOP' | 'BOTTOM' | 'SHOES' | 'COAT';
   createdAt: Date;
   updatedAt: Date;
 }
