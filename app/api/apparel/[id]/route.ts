@@ -2,14 +2,14 @@ import Apparel from '@/database/models/apparel';
 import { NextRequest, NextResponse } from 'next/server';
 
 interface Params {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export async function GET(request: NextRequest, { params }: Params) {
+  const { id } = await params;
   try {
-    const { id } = await params;
 
     const apparel = await Apparel.findOne({ id });
 
@@ -22,7 +22,7 @@ export async function GET(request: NextRequest, { params }: Params) {
 
     return NextResponse.json(apparel, { status: 200 });
   } catch (error) {
-    console.error(`Error fetching apparel with ID ${params.id}:`, error);
+    console.error(`Error fetching apparel with ID ${id}:`, error);
     return NextResponse.json(
       {
         message: 'Failed to fetch apparel item',
@@ -33,8 +33,8 @@ export async function GET(request: NextRequest, { params }: Params) {
 }
 
 export async function PUT(request: NextRequest, { params }: Params) {
+  const { id } = await params;
   try {
-    const { id } = await params;
     const body = await request.json();
 
     const updatedApparel = await Apparel.findOneAndUpdate(
@@ -52,7 +52,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
 
     return NextResponse.json(updatedApparel, { status: 200 });
   } catch (error) {
-    console.error(`Error updating apparel with ID ${params.id}:`, error);
+    console.error(`Error updating apparel with ID ${id}:`, error);
     return NextResponse.json(
       { message: 'Failed to update apparel item' },
       { status: 500 }
@@ -61,8 +61,8 @@ export async function PUT(request: NextRequest, { params }: Params) {
 }
 
 export async function DELETE(request: NextRequest, { params }: Params) {
+  const { id } = await params;
   try {
-    const { id } = await params;
 
     const deletedApparel = await Apparel.findOneAndDelete({ id });
 
@@ -77,7 +77,7 @@ export async function DELETE(request: NextRequest, { params }: Params) {
       { status: 200 }
     );
   } catch (error) {
-    console.error(`Error deleting apparel with ID ${params.id}:`, error);
+    console.error(`Error deleting apparel with ID ${id}:`, error);
     return NextResponse.json(
       { message: 'Failed to delete apparel item' },
       { status: 500 }

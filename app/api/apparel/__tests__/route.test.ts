@@ -12,7 +12,7 @@ const mockJsonResponse = jest.fn();
 const mockStatus = jest.fn().mockReturnValue({ json: mockJsonResponse });
 const mockResponse = {
   status: mockStatus,
-  json: mockJsonResponse
+  json: mockJsonResponse,
 };
 
 jest.mock('next/server', () => ({
@@ -21,8 +21,8 @@ jest.mock('next/server', () => ({
       mockJsonResponse(data);
       mockStatus(options?.status || 200);
       return mockResponse;
-    })
-  }
+    }),
+  },
 }));
 
 describe('Apparel API Routes', () => {
@@ -58,21 +58,21 @@ describe('Apparel API Routes', () => {
 
       expect(mockStatus).toHaveBeenCalledWith(500);
       expect(mockJsonResponse).toHaveBeenCalledWith({
-        message: 'Failed to fetch apparel items'
+        message: 'Failed to fetch apparel items',
       });
     });
     it('should return 404 when no apparel items are found', async () => {
       (Apparel.find as jest.Mock).mockImplementation(() => ({
         sort: jest.fn().mockResolvedValue([]),
       }));
-    
+
       await GET();
-    
+
       expect(Apparel.find).toHaveBeenCalledWith({});
       expect(mockStatus).toHaveBeenCalledWith(404);
       expect(mockJsonResponse).toHaveBeenCalledWith({
         message: 'No apparel items were found',
-        data: []
+        data: [],
       });
     });
   });
@@ -97,7 +97,7 @@ describe('Apparel API Routes', () => {
       };
 
       const mockRequest = {
-        json: jest.fn().mockResolvedValue(requestBody)
+        json: jest.fn().mockResolvedValue(requestBody),
       };
 
       await POST(mockRequest as any);
@@ -115,7 +115,7 @@ describe('Apparel API Routes', () => {
       };
 
       const mockRequest = {
-        json: jest.fn().mockResolvedValue(requestBody)
+        json: jest.fn().mockResolvedValue(requestBody),
       };
 
       await POST(mockRequest as any);
@@ -125,7 +125,7 @@ describe('Apparel API Routes', () => {
       expect(mockStatus).toHaveBeenCalledWith(400);
       expect(mockJsonResponse).toHaveBeenCalledWith(
         expect.objectContaining({
-          message: expect.stringContaining('required fields')
+          message: expect.stringContaining('required fields'),
         })
       );
     });
@@ -138,7 +138,7 @@ describe('Apparel API Routes', () => {
       };
 
       const mockRequest = {
-        json: jest.fn().mockResolvedValue(requestBody)
+        json: jest.fn().mockResolvedValue(requestBody),
       };
 
       await POST(mockRequest as any);
@@ -148,7 +148,7 @@ describe('Apparel API Routes', () => {
       expect(mockStatus).toHaveBeenCalledWith(400);
       expect(mockJsonResponse).toHaveBeenCalledWith(
         expect.objectContaining({
-          message: expect.stringContaining('Invalid apparel type')
+          message: expect.stringContaining('Invalid apparel type'),
         })
       );
     });
@@ -166,7 +166,7 @@ describe('Apparel API Routes', () => {
       };
 
       const mockRequest = {
-        json: jest.fn().mockResolvedValue(requestBody)
+        json: jest.fn().mockResolvedValue(requestBody),
       };
 
       await POST(mockRequest as any);
@@ -174,7 +174,7 @@ describe('Apparel API Routes', () => {
       expect(mockRequest.json).toHaveBeenCalled();
       expect(mockStatus).toHaveBeenCalledWith(500);
       expect(mockJsonResponse).toHaveBeenCalledWith({
-        message: 'Failed to create Apparel item'
+        message: 'Failed to create Apparel item',
       });
     });
   });

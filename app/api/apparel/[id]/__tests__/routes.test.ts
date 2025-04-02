@@ -21,19 +21,19 @@ const mockJsonResponse = jest.fn();
 const mockStatus = jest.fn().mockReturnValue({ json: mockJsonResponse });
 
 jest.mock('next/server', () => ({
-  NextRequest: function() {
+  NextRequest: function () {
     return {};
   },
   NextResponse: {
     json: jest.fn().mockImplementation((data, options) => {
       mockJsonResponse(data);
       mockStatus(options?.status || 200);
-      return { 
+      return {
         status: options?.status || 200,
-        json: async () => data
+        json: async () => data,
       };
-    })
-  }
+    }),
+  },
 }));
 
 describe('Apparel ID API Routes', () => {
@@ -60,7 +60,7 @@ describe('Apparel ID API Routes', () => {
 
       const mockRequest = {};
       const response = await GET(mockRequest as any, mockParams);
-      
+      console.log(response);
       expect(Apparel.findOne).toHaveBeenCalledWith({ id: 'test-id-123' });
       expect(mockStatus).toHaveBeenCalledWith(200);
       expect(mockJsonResponse).toHaveBeenCalledWith(mockApparel);
@@ -71,11 +71,11 @@ describe('Apparel ID API Routes', () => {
 
       const mockRequest = {};
       await GET(mockRequest as any, mockParams);
-      
+
       expect(mockStatus).toHaveBeenCalledWith(404);
       expect(mockJsonResponse).toHaveBeenCalledWith(
         expect.objectContaining({
-          message: expect.stringContaining('not found')
+          message: expect.stringContaining('not found'),
         })
       );
     });
@@ -87,10 +87,10 @@ describe('Apparel ID API Routes', () => {
 
       const mockRequest = {};
       await GET(mockRequest as any, mockParams);
-      
+
       expect(mockStatus).toHaveBeenCalledWith(500);
       expect(mockJsonResponse).toHaveBeenCalledWith({
-        message: 'Failed to fetch apparel item'
+        message: 'Failed to fetch apparel item',
       });
     });
   });
@@ -104,7 +104,9 @@ describe('Apparel ID API Routes', () => {
         type: 'TOP',
       };
 
-      (Apparel.findOneAndUpdate as jest.Mock).mockResolvedValue(mockUpdatedApparel);
+      (Apparel.findOneAndUpdate as jest.Mock).mockResolvedValue(
+        mockUpdatedApparel
+      );
 
       const requestBody = {
         title: 'Updated Shirt',
@@ -112,7 +114,7 @@ describe('Apparel ID API Routes', () => {
       };
 
       const mockRequest = {
-        json: jest.fn().mockResolvedValue(requestBody)
+        json: jest.fn().mockResolvedValue(requestBody),
       };
 
       await PUT(mockRequest as any, mockParams);
@@ -133,7 +135,7 @@ describe('Apparel ID API Routes', () => {
       const requestBody = { title: 'Updated Shirt' };
 
       const mockRequest = {
-        json: jest.fn().mockResolvedValue(requestBody)
+        json: jest.fn().mockResolvedValue(requestBody),
       };
 
       await PUT(mockRequest as any, mockParams);
@@ -141,7 +143,7 @@ describe('Apparel ID API Routes', () => {
       expect(mockStatus).toHaveBeenCalledWith(404);
       expect(mockJsonResponse).toHaveBeenCalledWith(
         expect.objectContaining({
-          message: expect.stringContaining('not found')
+          message: expect.stringContaining('not found'),
         })
       );
     });
@@ -154,14 +156,14 @@ describe('Apparel ID API Routes', () => {
       const requestBody = { title: 'Updated Shirt' };
 
       const mockRequest = {
-        json: jest.fn().mockResolvedValue(requestBody)
+        json: jest.fn().mockResolvedValue(requestBody),
       };
 
       await PUT(mockRequest as any, mockParams);
 
       expect(mockStatus).toHaveBeenCalledWith(500);
       expect(mockJsonResponse).toHaveBeenCalledWith({
-        message: 'Failed to update apparel item'
+        message: 'Failed to update apparel item',
       });
     });
   });
@@ -173,16 +175,20 @@ describe('Apparel ID API Routes', () => {
         title: 'Deleted Shirt',
       };
 
-      (Apparel.findOneAndDelete as jest.Mock).mockResolvedValue(mockDeletedApparel);
+      (Apparel.findOneAndDelete as jest.Mock).mockResolvedValue(
+        mockDeletedApparel
+      );
 
       const mockRequest = {};
-      
+
       await DELETE(mockRequest as any, mockParams);
 
-      expect(Apparel.findOneAndDelete).toHaveBeenCalledWith({ id: 'test-id-123' });
+      expect(Apparel.findOneAndDelete).toHaveBeenCalledWith({
+        id: 'test-id-123',
+      });
       expect(mockStatus).toHaveBeenCalledWith(200);
       expect(mockJsonResponse).toHaveBeenCalledWith({
-        message: `Apparel with ID test-id-123 deleted successfully`
+        message: `Apparel with ID test-id-123 deleted successfully`,
       });
     });
 
@@ -190,13 +196,13 @@ describe('Apparel ID API Routes', () => {
       (Apparel.findOneAndDelete as jest.Mock).mockResolvedValue(null);
 
       const mockRequest = {};
-      
+
       await DELETE(mockRequest as any, mockParams);
 
       expect(mockStatus).toHaveBeenCalledWith(404);
       expect(mockJsonResponse).toHaveBeenCalledWith(
         expect.objectContaining({
-          message: expect.stringContaining('not found')
+          message: expect.stringContaining('not found'),
         })
       );
     });
@@ -207,12 +213,12 @@ describe('Apparel ID API Routes', () => {
       });
 
       const mockRequest = {};
-      
+
       await DELETE(mockRequest as any, mockParams);
 
       expect(mockStatus).toHaveBeenCalledWith(500);
       expect(mockJsonResponse).toHaveBeenCalledWith({
-        message: 'Failed to delete apparel item'
+        message: 'Failed to delete apparel item',
       });
     });
   });
