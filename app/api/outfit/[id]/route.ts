@@ -19,7 +19,6 @@ const populateOptions = apparelFields.map((field) => ({
 
 export async function GET(request: Request, { params }: Params) {
   const { id } = await params;
-  console.log(id)
   try {
     const outfit = await Outfit.findOne({ id }).populate(populateOptions);
     if (!outfit) {
@@ -34,6 +33,56 @@ export async function GET(request: Request, { params }: Params) {
     return NextResponse.json(
       { message: `Outfit with ID ${id} nor found` },
       { status: 404 }
+    );
+  }
+}
+
+export async function PUT(request: Request, { params }: Params) {
+  const { id } = await params;
+  try {
+    const body = await request.json();
+    const updatedOutfit = await Outfit.findOneAndUpdate(
+      { id },
+      { $set: body },
+      { new: true, runValidators: true }
+    );
+    if (!updatedOutfit) {
+      return NextResponse.json(
+        { message: `Outfit with ID ${id} not found` },
+        { status: 404 }
+      );
+    }
+    return NextResponse.json(updatedOutfit, { status: 200 });
+  } catch (error) {
+    console.error(`Error updating outfit with ID ${id}`, error);
+    return NextResponse.json(
+      { message: `Failed to update outfit` },
+      { status: 404 }
+    );
+  }
+}
+
+export async function DELETE(request: Request, { params }: Params) {
+  const { id } = await params;
+  try {
+    const deletedOutfit = await Outfit.findOneAndDelete({ id });
+    if (!deletedOutfit) {
+      return NextResponse.json(
+        { message: `Outfit with ID ${id} not found` },
+        { status: 404 }
+      );
+    }
+    return NextResponse.json(
+      { message: `Outfit with ID ${id} deleted succesfully` },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error(`Error deleting outfit with ID ${id}`, error);
+    return NextResponse.json(
+      {
+        message: 'Failed to delete outfit',
+      },
+      { status: 500 }
     );
   }
 }

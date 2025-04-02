@@ -10,9 +10,7 @@ interface Params {
 export async function GET(request: NextRequest, { params }: Params) {
   const { id } = await params;
   try {
-
     const apparel = await Apparel.findOne({ id });
-
     if (!apparel) {
       return NextResponse.json(
         { message: `Apparel with ID ${id} not found` },
@@ -36,7 +34,6 @@ export async function PUT(request: NextRequest, { params }: Params) {
   const { id } = await params;
   try {
     const body = await request.json();
-
     const updatedApparel = await Apparel.findOneAndUpdate(
       { id },
       { $set: body },
@@ -63,9 +60,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
 export async function DELETE(request: NextRequest, { params }: Params) {
   const { id } = await params;
   try {
-
     const deletedApparel = await Apparel.findOneAndDelete({ id });
-
     if (!deletedApparel) {
       return NextResponse.json(
         { message: `Apparel with ID ${id} not found` },
