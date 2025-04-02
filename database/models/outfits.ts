@@ -49,7 +49,7 @@ const OutfitSchema = new Schema<IOutfit>(
     },
     pictureURL: {
       type: String,
-      require: false,
+      required: false,
     },
     tags: [
       {
