@@ -29,11 +29,11 @@ const ApparelSchema = new Schema<IApparel>(
     },
     description: {
       type: String,
-      required: true,
+      required: false,
     },
     type: {
       type: String,
-      enum: ['TOP', 'BOTTOM', 'SHOES'],
+      enum: ['TOP', 'BOTTOM', 'SHOES', 'COAT'],
       required: true,
     },
   },

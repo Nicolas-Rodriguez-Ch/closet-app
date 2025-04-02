@@ -34,9 +34,9 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!['TOP', 'BOTTOM', 'SHOES'].includes(body.type)) {
+    if (!['TOP', 'BOTTOM', 'SHOES', 'COAT'].includes(body.type)) {
       return NextResponse.json(
-        { message: 'Invalid apparel type. Must be TOP, BOTTOM, or SHOES' },
+        { message: 'Invalid apparel type. Must be TOP, BOTTOM, SHOES or COAT' },
         { status: 400 }
       );
     }
