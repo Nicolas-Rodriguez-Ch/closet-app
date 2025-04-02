@@ -5,9 +5,11 @@ export interface IOutfit extends Document {
   id: string;
   title: string;
   description?: string;
-  topID: mongoose.Types.ObjectId;
-  bottomID: mongoose.Types.ObjectId;
-  shoesID: mongoose.Types.ObjectId;
+  pictureURL?: string;
+  topID: string;
+  bottomID: string;
+  shoesID: string;
+  coatID?: string;
   tags: string[];
   createdAt: Date;
   updatedAt: Date;
@@ -26,19 +28,28 @@ const OutfitSchema = new Schema<IOutfit>(
       required: true,
     },
     topID: {
-      type: Schema.Types.ObjectId,
+      type: String,
       ref: 'Apparel',
       required: true,
     },
     bottomID: {
-      type: Schema.Types.ObjectId,
+      type: String,
       ref: 'Apparel',
       required: true,
     },
     shoesID: {
-      type: Schema.Types.ObjectId,
+      type: String,
       ref: 'Apparel',
       required: true,
+    },
+    coatID: {
+      type: String,
+      ref: 'Apparel',
+      required: false,
+    },
+    pictureURL: {
+      type: String,
+      required: false,
     },
     tags: [
       {

@@ -6,7 +6,7 @@ export interface IApparel extends Document {
   pictureURL: string;
   title: string;
   description?: string;
-  type: 'TOP' | 'BOTTOM' | 'SHOES';
+  type: 'TOP' | 'BOTTOM' | 'SHOES' | 'COAT';
   createdAt: Date;
   updatedAt: Date;
 }
@@ -29,11 +29,11 @@ const ApparelSchema = new Schema<IApparel>(
     },
     description: {
       type: String,
-      required: true,
+      required: false,
     },
     type: {
       type: String,
-      enum: ['TOP', 'BOTTOM', 'SHOES'],
+      enum: ['TOP', 'BOTTOM', 'SHOES', 'COAT'],
       required: true,
     },
   },
