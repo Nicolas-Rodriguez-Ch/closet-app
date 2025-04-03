@@ -1,14 +1,15 @@
-jest.mock('@/database/db', () => ({
-  __esModule: true,
-  default: jest.fn()
-}));
-jest.mock('@/database/models/outfits', () => ({
-  findOne: jest.fn(),
-  findOneAndUpdate: jest.fn(),
-  findOneAndDelete: jest.fn(),
-}));
+import { GET, PUT, DELETE } from '../route';
+import { 
+  getOutfitById, 
+  updateOutfitById, 
+  deleteOutfitById 
+} from '@/services/outfitServices';
 
-jest.mock('@/database/models/apparel', () => ({}));
+jest.mock('@/services/outfitServices', () => ({
+  getOutfitById: jest.fn(),
+  updateOutfitById: jest.fn(),
+  deleteOutfitById: jest.fn()
+}));
 
 jest.spyOn(console, 'error').mockImplementation(() => {});
 
@@ -29,9 +30,6 @@ jest.mock('next/server', () => ({
   },
 }));
 
-import { GET, PUT, DELETE } from '../route';
-import Outfit from '@/database/models/outfits';
-
 describe('Outfit ID API Routes', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -48,10 +46,7 @@ describe('Outfit ID API Routes', () => {
         tags: ['summer', 'casual']
       };
 
-      const mockPopulate = jest.fn().mockResolvedValue(mockOutfit);
-      (Outfit.findOne as jest.Mock).mockReturnValue({
-        populate: mockPopulate
-      });
+      (getOutfitById as jest.Mock).mockResolvedValue(mockOutfit);
 
       const mockParams = Promise.resolve({ id: 'outfit-123' });
       const mockRequest = {} as Request;
@@ -59,17 +54,13 @@ describe('Outfit ID API Routes', () => {
 
       await GET(mockRequest, contextObj);
 
-      expect(Outfit.findOne).toHaveBeenCalledWith({ id: 'outfit-123' });
-      expect(mockPopulate).toHaveBeenCalled();
+      expect(getOutfitById).toHaveBeenCalledWith('outfit-123');
       expect(mockStatus).toHaveBeenCalledWith(200);
       expect(mockJsonResponse).toHaveBeenCalledWith(mockOutfit);
     });
 
     it('should return 404 when outfit is not found', async () => {
-      const mockPopulate = jest.fn().mockResolvedValue(null);
-      (Outfit.findOne as jest.Mock).mockReturnValue({
-        populate: mockPopulate
-      });
+      (getOutfitById as jest.Mock).mockResolvedValue(null);
 
       const mockParams = Promise.resolve({ id: 'non-existent-id' });
       const mockRequest = {} as Request;
@@ -77,7 +68,7 @@ describe('Outfit ID API Routes', () => {
 
       await GET(mockRequest, contextObj);
 
-      expect(Outfit.findOne).toHaveBeenCalledWith({ id: 'non-existent-id' });
+      expect(getOutfitById).toHaveBeenCalledWith('non-existent-id');
       expect(mockStatus).toHaveBeenCalledWith(404);
       expect(mockJsonResponse).toHaveBeenCalledWith({ 
         message: 'Outfit with ID non-existent-id not found' 
@@ -86,9 +77,7 @@ describe('Outfit ID API Routes', () => {
 
     it('should handle errors and return 404', async () => {
       const testError = new Error('Database error');
-      (Outfit.findOne as jest.Mock).mockImplementation(() => {
-        throw testError;
-      });
+      (getOutfitById as jest.Mock).mockRejectedValue(testError);
 
       const mockParams = Promise.resolve({ id: 'outfit-123' });
       const mockRequest = {} as Request;
@@ -96,6 +85,7 @@ describe('Outfit ID API Routes', () => {
 
       await GET(mockRequest, contextObj);
 
+      expect(getOutfitById).toHaveBeenCalledWith('outfit-123');
       expect(console.error).toHaveBeenCalled();
       expect(mockStatus).toHaveBeenCalledWith(404);
       expect(mockJsonResponse).toHaveBeenCalledWith({ 
@@ -115,7 +105,7 @@ describe('Outfit ID API Routes', () => {
         tags: ['summer', 'casual', 'updated']
       };
 
-      (Outfit.findOneAndUpdate as jest.Mock).mockResolvedValue(mockUpdatedOutfit);
+      (updateOutfitById as jest.Mock).mockResolvedValue(mockUpdatedOutfit);
 
       const requestBody = {
         title: 'Updated Summer Outfit',
@@ -132,17 +122,13 @@ describe('Outfit ID API Routes', () => {
       await PUT(mockRequest, contextObj);
 
       expect(mockRequest.json).toHaveBeenCalled();
-      expect(Outfit.findOneAndUpdate).toHaveBeenCalledWith(
-        { id: 'outfit-123' },
-        { $set: requestBody },
-        { new: true, runValidators: true }
-      );
+      expect(updateOutfitById).toHaveBeenCalledWith('outfit-123', requestBody);
       expect(mockStatus).toHaveBeenCalledWith(200);
       expect(mockJsonResponse).toHaveBeenCalledWith(mockUpdatedOutfit);
     });
 
     it('should return 404 when outfit to update is not found', async () => {
-      (Outfit.findOneAndUpdate as jest.Mock).mockResolvedValue(null);
+      (updateOutfitById as jest.Mock).mockResolvedValue(null);
 
       const requestBody = {
         title: 'Updated Title',
@@ -159,7 +145,7 @@ describe('Outfit ID API Routes', () => {
       await PUT(mockRequest, contextObj);
 
       expect(mockRequest.json).toHaveBeenCalled();
-      expect(Outfit.findOneAndUpdate).toHaveBeenCalled();
+      expect(updateOutfitById).toHaveBeenCalledWith('non-existent-id', requestBody);
       expect(mockStatus).toHaveBeenCalledWith(404);
       expect(mockJsonResponse).toHaveBeenCalledWith({ 
         message: 'Outfit with ID non-existent-id not found' 
@@ -168,9 +154,7 @@ describe('Outfit ID API Routes', () => {
 
     it('should handle errors and return 404', async () => {
       const testError = new Error('Database error');
-      (Outfit.findOneAndUpdate as jest.Mock).mockImplementation(() => {
-        throw testError;
-      });
+      (updateOutfitById as jest.Mock).mockRejectedValue(testError);
 
       const requestBody = { title: 'Will Fail' };
       const mockRequest = {
@@ -183,6 +167,7 @@ describe('Outfit ID API Routes', () => {
       await PUT(mockRequest, contextObj);
 
       expect(mockRequest.json).toHaveBeenCalled();
+      expect(updateOutfitById).toHaveBeenCalledWith('outfit-123', requestBody);
       expect(console.error).toHaveBeenCalled();
       expect(mockStatus).toHaveBeenCalledWith(404);
       expect(mockJsonResponse).toHaveBeenCalledWith({ 
@@ -201,7 +186,7 @@ describe('Outfit ID API Routes', () => {
         shoesID: 'shoes1'
       };
 
-      (Outfit.findOneAndDelete as jest.Mock).mockResolvedValue(mockDeletedOutfit);
+      (deleteOutfitById as jest.Mock).mockResolvedValue(mockDeletedOutfit);
 
       const mockRequest = {} as Request;
       const mockParams = Promise.resolve({ id: 'outfit-123' });
@@ -209,7 +194,7 @@ describe('Outfit ID API Routes', () => {
 
       await DELETE(mockRequest, contextObj);
 
-      expect(Outfit.findOneAndDelete).toHaveBeenCalledWith({ id: 'outfit-123' });
+      expect(deleteOutfitById).toHaveBeenCalledWith('outfit-123');
       expect(mockStatus).toHaveBeenCalledWith(200);
       expect(mockJsonResponse).toHaveBeenCalledWith({ 
         message: 'Outfit with ID outfit-123 deleted succesfully' 
@@ -217,7 +202,7 @@ describe('Outfit ID API Routes', () => {
     });
 
     it('should return 404 when outfit to delete is not found', async () => {
-      (Outfit.findOneAndDelete as jest.Mock).mockResolvedValue(null);
+      (deleteOutfitById as jest.Mock).mockResolvedValue(null);
 
       const mockRequest = {} as Request;
       const mockParams = Promise.resolve({ id: 'non-existent-id' });
@@ -225,7 +210,7 @@ describe('Outfit ID API Routes', () => {
 
       await DELETE(mockRequest, contextObj);
 
-      expect(Outfit.findOneAndDelete).toHaveBeenCalledWith({ id: 'non-existent-id' });
+      expect(deleteOutfitById).toHaveBeenCalledWith('non-existent-id');
       expect(mockStatus).toHaveBeenCalledWith(404);
       expect(mockJsonResponse).toHaveBeenCalledWith({ 
         message: 'Outfit with ID non-existent-id not found' 
@@ -234,9 +219,7 @@ describe('Outfit ID API Routes', () => {
 
     it('should handle errors and return 500', async () => {
       const testError = new Error('Database error');
-      (Outfit.findOneAndDelete as jest.Mock).mockImplementation(() => {
-        throw testError;
-      });
+      (deleteOutfitById as jest.Mock).mockRejectedValue(testError);
 
       const mockRequest = {} as Request;
       const mockParams = Promise.resolve({ id: 'outfit-123' });
@@ -244,6 +227,7 @@ describe('Outfit ID API Routes', () => {
 
       await DELETE(mockRequest, contextObj);
 
+      expect(deleteOutfitById).toHaveBeenCalledWith('outfit-123');
       expect(console.error).toHaveBeenCalled();
       expect(mockStatus).toHaveBeenCalledWith(500);
       expect(mockJsonResponse).toHaveBeenCalledWith({ 
