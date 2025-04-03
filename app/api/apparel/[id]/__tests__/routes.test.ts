@@ -1,22 +1,19 @@
-// app/api/apparel/[id]/__tests__/route.test.ts
-
-// Import the route handlers
+jest.mock('@/database/db', () => ({
+  __esModule: true,
+  default: jest.fn()
+}));
 import { GET, PUT, DELETE } from '../route';
 
-// Mock the Apparel model
 jest.mock('@/database/models/apparel', () => ({
   findOne: jest.fn(),
   findOneAndUpdate: jest.fn(),
   findOneAndDelete: jest.fn(),
 }));
 
-// Get a reference to the mocked Apparel model
 import Apparel from '@/database/models/apparel';
 
-// Mock console.error to prevent error logs
 jest.spyOn(console, 'error').mockImplementation(() => {});
 
-// Mock NextResponse
 const mockJsonResponse = jest.fn();
 const mockStatus = jest.fn().mockReturnValue({ json: mockJsonResponse });
 

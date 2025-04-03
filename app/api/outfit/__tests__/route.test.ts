@@ -1,3 +1,7 @@
+jest.mock('@/database/db', () => ({
+  __esModule: true,
+  default: jest.fn(),
+}));
 import { GET, POST } from '../route';
 
 jest.mock('@/database/models/outfits', () => ({
@@ -36,22 +40,22 @@ describe('Outfit API Routes', () => {
   describe('GET /api/outfit', () => {
     it('should return all outfit items', async () => {
       const mockOutfits = [
-        { 
-          id: '1', 
-          title: 'Summer Outfit', 
-          topID: 'top1', 
-          bottomID: 'bottom1', 
+        {
+          id: '1',
+          title: 'Summer Outfit',
+          topID: 'top1',
+          bottomID: 'bottom1',
           shoesID: 'shoes1',
-          tags: ['summer', 'casual']
-        }
+          tags: ['summer', 'casual'],
+        },
       ];
 
       const mockPopulate = jest.fn().mockReturnThis();
       const mockSort = jest.fn().mockResolvedValue(mockOutfits);
-      
+
       (Outfit.find as jest.Mock).mockImplementation(() => ({
         populate: mockPopulate,
-        sort: mockSort
+        sort: mockSort,
       }));
 
       await GET();
@@ -66,10 +70,10 @@ describe('Outfit API Routes', () => {
     it('should return 404 when no outfits are found', async () => {
       const mockPopulate = jest.fn().mockReturnThis();
       const mockSort = jest.fn().mockResolvedValue([]);
-      
+
       (Outfit.find as jest.Mock).mockImplementation(() => ({
         populate: mockPopulate,
-        sort: mockSort
+        sort: mockSort,
       }));
 
       await GET();
@@ -79,13 +83,13 @@ describe('Outfit API Routes', () => {
       expect(mockStatus).toHaveBeenCalledWith(404);
       expect(mockJsonResponse).toHaveBeenCalledWith({
         message: 'No outfits were found',
-        data: []
+        data: [],
       });
     });
 
     it('should handle errors and return 500', async () => {
       const testError = new Error('Database error');
-      
+
       (Outfit.find as jest.Mock).mockImplementation(() => {
         throw testError;
       });
@@ -94,7 +98,7 @@ describe('Outfit API Routes', () => {
 
       expect(mockStatus).toHaveBeenCalledWith(500);
       expect(mockJsonResponse).toHaveBeenCalledWith({
-        message: 'Error fetching outfits'
+        message: 'Error fetching outfits',
       });
       expect(console.error).toHaveBeenCalled();
     });
@@ -110,7 +114,7 @@ describe('Outfit API Routes', () => {
         shoesID: 'shoes123',
         tags: ['casual', 'spring'],
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
 
       (Outfit.create as jest.Mock).mockResolvedValue(mockOutfit);
@@ -120,7 +124,7 @@ describe('Outfit API Routes', () => {
         topID: 'top123',
         bottomID: 'bottom123',
         shoesID: 'shoes123',
-        tags: ['casual', 'spring']
+        tags: ['casual', 'spring'],
       };
 
       const mockRequest = {
@@ -139,7 +143,7 @@ describe('Outfit API Routes', () => {
       const requestBody = {
         title: 'New Outfit',
         bottomID: 'bottom123',
-        shoesID: 'shoes123'
+        shoesID: 'shoes123',
       };
 
       const mockRequest = {
@@ -153,7 +157,7 @@ describe('Outfit API Routes', () => {
       expect(mockStatus).toHaveBeenCalledWith(400);
       expect(mockJsonResponse).toHaveBeenCalledWith(
         expect.objectContaining({
-          message: expect.stringContaining('Missing required fields')
+          message: expect.stringContaining('Missing required fields'),
         })
       );
     });
@@ -169,7 +173,7 @@ describe('Outfit API Routes', () => {
         topID: 'top123',
         bottomID: 'bottom123',
         shoesID: 'shoes123',
-        tags: ['casual', 'spring']
+        tags: ['casual', 'spring'],
       };
 
       const mockRequest = {
@@ -181,7 +185,7 @@ describe('Outfit API Routes', () => {
       expect(mockRequest.json).toHaveBeenCalled();
       expect(mockStatus).toHaveBeenCalledWith(500);
       expect(mockJsonResponse).toHaveBeenCalledWith({
-        message: 'Failed to create outfit'
+        message: 'Failed to create outfit',
       });
       expect(console.error).toHaveBeenCalled();
     });

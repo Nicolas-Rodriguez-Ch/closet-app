@@ -1,8 +1,10 @@
+import connectDB from '@/database/db';
 import Apparel from '@/database/models/apparel';
 import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
+    connectDB();
     const apparels = await Apparel.find({}).sort({ updatedAt: -1 });
     if (!apparels.length) {
       return NextResponse.json(
@@ -22,6 +24,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    connectDB();
     const body = await request.json();
 
     if (!body.title || !body.pictureURL || !body.type) {

@@ -1,9 +1,11 @@
+import connectDB from '@/database/db';
 import Apparel from '@/database/models/apparel';
 import Outfit from '@/database/models/outfits';
 import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
+    connectDB();
     const apparelFields = ['topID', 'bottomID', 'shoesID', 'coatID'];
 
     const populateOptions = apparelFields.map((field) => ({
@@ -35,6 +37,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    connectDB();
     const body = await request.json();
     if (
       !body.title ||

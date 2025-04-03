@@ -1,3 +1,8 @@
+jest.mock('@/database/db', () => ({
+  __esModule: true,
+  default: jest.fn()
+}));
+
 import { GET, POST } from '../route';
 import Apparel from '@/database/models/apparel';
 

@@ -1,3 +1,4 @@
+import connectDB from '@/database/db';
 import Apparel from '@/database/models/apparel';
 import Outfit from '@/database/models/outfits';
 import { NextResponse } from 'next/server';
@@ -20,6 +21,7 @@ const populateOptions = apparelFields.map((field) => ({
 export async function GET(request: Request, { params }: Params) {
   const { id } = await params;
   try {
+    connectDB();
     const outfit = await Outfit.findOne({ id }).populate(populateOptions);
     if (!outfit) {
       return NextResponse.json(
@@ -40,6 +42,7 @@ export async function GET(request: Request, { params }: Params) {
 export async function PUT(request: Request, { params }: Params) {
   const { id } = await params;
   try {
+    connectDB();
     const body = await request.json();
     const updatedOutfit = await Outfit.findOneAndUpdate(
       { id },
@@ -65,6 +68,7 @@ export async function PUT(request: Request, { params }: Params) {
 export async function DELETE(request: Request, { params }: Params) {
   const { id } = await params;
   try {
+    connectDB();
     const deletedOutfit = await Outfit.findOneAndDelete({ id });
     if (!deletedOutfit) {
       return NextResponse.json(
