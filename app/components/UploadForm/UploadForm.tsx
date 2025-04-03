@@ -2,15 +2,11 @@
 
 import Image from 'next/image';
 import React, { ChangeEvent, FormEvent, useState } from 'react';
-enum ApparelTypeEnum {
-  TOP = 'TOP',
-  BOTTOM = 'BOTTOM',
-  SHOES = 'SHOES',
-  COAT = 'COAT',
-}
+import { ApparelForm, ApparelTypeEnum } from './utils/types';
+import { orchestrateApparelSubmit } from './utils/sumbitHelper';
 
 const UploadForm = () => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ApparelForm>({
     apparelTitle: '',
     apparelDescription: '',
     apparelType: ApparelTypeEnum.TOP,
@@ -40,13 +36,18 @@ const UploadForm = () => {
     }
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(e);
+    if (imageFile) {
+      await orchestrateApparelSubmit(imageFile, formData);
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit} className='flex flex-col gap-3.5 p-3.5 justify-center content-center md:w-1/2'>
+    <form
+      onSubmit={handleSubmit}
+      className='flex flex-col gap-3.5 p-3.5 justify-center content-center md:w-1/2'
+    >
       <section className='flex flex-col gap-3 p-3'>
         <label htmlFor='imageUpload' className='cursor-pointer'>
           Upload Apparel Image
@@ -59,6 +60,7 @@ const UploadForm = () => {
           onChange={handleImageUpload}
           max-size='10485760'
           className='cursor-pointer'
+          required
         />
         {imageFile && (
           <div className='mt-3 flex justify-center'>
