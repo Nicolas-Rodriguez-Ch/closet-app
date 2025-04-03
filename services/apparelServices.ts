@@ -12,3 +12,25 @@ export const createNewApparel = async (body: any) => {
   const newApparel = await Apparel.create(body);
   return newApparel;
 };
+
+export const findApparelById = async (id: string) => {
+  connectDB();
+  const apparel = await Apparel.findOne({ id });
+  return apparel;
+};
+
+export const updateApparelById = async (id: string, body: any) => {
+  connectDB();
+  const updatedApparel = await Apparel.findOneAndUpdate(
+    { id },
+    { $set: body },
+    { new: true, runValidators: true }
+  );
+  return updatedApparel;
+};
+
+export const deleteApparelById = async (id: string) => {
+  connectDB();
+  const deletedApparel = await Apparel.findOneAndDelete({ id });
+  return deletedApparel;
+};

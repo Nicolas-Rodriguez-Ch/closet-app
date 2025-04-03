@@ -1,16 +1,15 @@
-jest.mock('@/database/db', () => ({
-  __esModule: true,
-  default: jest.fn()
-}));
 import { GET, PUT, DELETE } from '../route';
+import {
+  findApparelById,
+  updateApparelById,
+  deleteApparelById,
+} from '@/services/apparelServices';
 
-jest.mock('@/database/models/apparel', () => ({
-  findOne: jest.fn(),
-  findOneAndUpdate: jest.fn(),
-  findOneAndDelete: jest.fn(),
+jest.mock('@/services/apparelServices', () => ({
+  findApparelById: jest.fn(),
+  updateApparelById: jest.fn(),
+  deleteApparelById: jest.fn(),
 }));
-
-import Apparel from '@/database/models/apparel';
 
 jest.spyOn(console, 'error').mockImplementation(() => {});
 
@@ -39,9 +38,9 @@ describe('Apparel ID API Routes', () => {
   });
 
   const mockParams = {
-    params: {
+    params: Promise.resolve({
       id: 'test-id-123',
-    },
+    }),
   };
 
   describe('GET /api/apparel/[id]', () => {
@@ -53,22 +52,24 @@ describe('Apparel ID API Routes', () => {
         type: 'TOP',
       };
 
-      (Apparel.findOne as jest.Mock).mockResolvedValue(mockApparel);
+      (findApparelById as jest.Mock).mockResolvedValue(mockApparel);
 
       const mockRequest = {};
       const response = await GET(mockRequest as any, mockParams);
-      console.log(response);
-      expect(Apparel.findOne).toHaveBeenCalledWith({ id: 'test-id-123' });
+
+      expect(findApparelById).toHaveBeenCalledWith('test-id-123');
       expect(mockStatus).toHaveBeenCalledWith(200);
+      expect(response.status).toBe(200);
       expect(mockJsonResponse).toHaveBeenCalledWith(mockApparel);
     });
 
     it('should return 404 if apparel is not found', async () => {
-      (Apparel.findOne as jest.Mock).mockResolvedValue(null);
+      (findApparelById as jest.Mock).mockResolvedValue(null);
 
       const mockRequest = {};
       await GET(mockRequest as any, mockParams);
 
+      expect(findApparelById).toHaveBeenCalledWith('test-id-123');
       expect(mockStatus).toHaveBeenCalledWith(404);
       expect(mockJsonResponse).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -78,13 +79,14 @@ describe('Apparel ID API Routes', () => {
     });
 
     it('should handle errors and return 500', async () => {
-      (Apparel.findOne as jest.Mock).mockImplementation(() => {
-        throw new Error('Database error');
-      });
+      const testError = new Error('Database error');
+      (findApparelById as jest.Mock).mockRejectedValue(testError);
 
       const mockRequest = {};
       await GET(mockRequest as any, mockParams);
 
+      expect(findApparelById).toHaveBeenCalledWith('test-id-123');
+      expect(console.error).toHaveBeenCalled();
       expect(mockStatus).toHaveBeenCalledWith(500);
       expect(mockJsonResponse).toHaveBeenCalledWith({
         message: 'Failed to fetch apparel item',
@@ -101,9 +103,7 @@ describe('Apparel ID API Routes', () => {
         type: 'TOP',
       };
 
-      (Apparel.findOneAndUpdate as jest.Mock).mockResolvedValue(
-        mockUpdatedApparel
-      );
+      (updateApparelById as jest.Mock).mockResolvedValue(mockUpdatedApparel);
 
       const requestBody = {
         title: 'Updated Shirt',
@@ -117,17 +117,16 @@ describe('Apparel ID API Routes', () => {
       await PUT(mockRequest as any, mockParams);
 
       expect(mockRequest.json).toHaveBeenCalled();
-      expect(Apparel.findOneAndUpdate).toHaveBeenCalledWith(
-        { id: 'test-id-123' },
-        { $set: requestBody },
-        { new: true, runValidators: true }
+      expect(updateApparelById).toHaveBeenCalledWith(
+        'test-id-123',
+        requestBody
       );
       expect(mockStatus).toHaveBeenCalledWith(200);
       expect(mockJsonResponse).toHaveBeenCalledWith(mockUpdatedApparel);
     });
 
     it('should return 404 if apparel is not found', async () => {
-      (Apparel.findOneAndUpdate as jest.Mock).mockResolvedValue(null);
+      (updateApparelById as jest.Mock).mockResolvedValue(null);
 
       const requestBody = { title: 'Updated Shirt' };
 
@@ -137,6 +136,10 @@ describe('Apparel ID API Routes', () => {
 
       await PUT(mockRequest as any, mockParams);
 
+      expect(updateApparelById).toHaveBeenCalledWith(
+        'test-id-123',
+        requestBody
+      );
       expect(mockStatus).toHaveBeenCalledWith(404);
       expect(mockJsonResponse).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -146,9 +149,8 @@ describe('Apparel ID API Routes', () => {
     });
 
     it('should handle errors and return 500', async () => {
-      (Apparel.findOneAndUpdate as jest.Mock).mockImplementation(() => {
-        throw new Error('Database error');
-      });
+      const testError = new Error('Database error');
+      (updateApparelById as jest.Mock).mockRejectedValue(testError);
 
       const requestBody = { title: 'Updated Shirt' };
 
@@ -158,6 +160,11 @@ describe('Apparel ID API Routes', () => {
 
       await PUT(mockRequest as any, mockParams);
 
+      expect(updateApparelById).toHaveBeenCalledWith(
+        'test-id-123',
+        requestBody
+      );
+      expect(console.error).toHaveBeenCalled();
       expect(mockStatus).toHaveBeenCalledWith(500);
       expect(mockJsonResponse).toHaveBeenCalledWith({
         message: 'Failed to update apparel item',
@@ -172,17 +179,13 @@ describe('Apparel ID API Routes', () => {
         title: 'Deleted Shirt',
       };
 
-      (Apparel.findOneAndDelete as jest.Mock).mockResolvedValue(
-        mockDeletedApparel
-      );
+      (deleteApparelById as jest.Mock).mockResolvedValue(mockDeletedApparel);
 
       const mockRequest = {};
 
       await DELETE(mockRequest as any, mockParams);
 
-      expect(Apparel.findOneAndDelete).toHaveBeenCalledWith({
-        id: 'test-id-123',
-      });
+      expect(deleteApparelById).toHaveBeenCalledWith('test-id-123');
       expect(mockStatus).toHaveBeenCalledWith(200);
       expect(mockJsonResponse).toHaveBeenCalledWith({
         message: `Apparel with ID test-id-123 deleted successfully`,
@@ -190,12 +193,13 @@ describe('Apparel ID API Routes', () => {
     });
 
     it('should return 404 if apparel is not found', async () => {
-      (Apparel.findOneAndDelete as jest.Mock).mockResolvedValue(null);
+      (deleteApparelById as jest.Mock).mockResolvedValue(null);
 
       const mockRequest = {};
 
       await DELETE(mockRequest as any, mockParams);
 
+      expect(deleteApparelById).toHaveBeenCalledWith('test-id-123');
       expect(mockStatus).toHaveBeenCalledWith(404);
       expect(mockJsonResponse).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -205,14 +209,15 @@ describe('Apparel ID API Routes', () => {
     });
 
     it('should handle errors and return 500', async () => {
-      (Apparel.findOneAndDelete as jest.Mock).mockImplementation(() => {
-        throw new Error('Database error');
-      });
+      const testError = new Error('Database error');
+      (deleteApparelById as jest.Mock).mockRejectedValue(testError);
 
       const mockRequest = {};
 
       await DELETE(mockRequest as any, mockParams);
 
+      expect(deleteApparelById).toHaveBeenCalledWith('test-id-123');
+      expect(console.error).toHaveBeenCalled();
       expect(mockStatus).toHaveBeenCalledWith(500);
       expect(mockJsonResponse).toHaveBeenCalledWith({
         message: 'Failed to delete apparel item',
