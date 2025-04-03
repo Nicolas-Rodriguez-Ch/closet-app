@@ -1,3 +1,7 @@
+jest.mock('@/database/db', () => ({
+  __esModule: true,
+  default: jest.fn()
+}));
 jest.mock('@/database/models/outfits', () => ({
   findOne: jest.fn(),
   findOneAndUpdate: jest.fn(),
