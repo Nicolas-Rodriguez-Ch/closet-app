@@ -1,6 +1,8 @@
-import connectDB from '@/database/db';
-import Apparel from '@/database/models/apparel';
-import Outfit from '@/database/models/outfits';
+import {
+  deleteOutfitById,
+  getOutfitById,
+  updateOutfitById,
+} from '@/services/outfitServices';
 import { NextResponse } from 'next/server';
 
 interface Params {
@@ -9,20 +11,10 @@ interface Params {
   }>;
 }
 
-const apparelFields = ['topID', 'bottomID', 'shoesID', 'coatID'];
-
-const populateOptions = apparelFields.map((field) => ({
-  path: field,
-  model: Apparel,
-  foreignField: 'id',
-  localField: field,
-}));
-
 export async function GET(request: Request, { params }: Params) {
   const { id } = await params;
   try {
-    connectDB();
-    const outfit = await Outfit.findOne({ id }).populate(populateOptions);
+    const outfit = await getOutfitById(id);
     if (!outfit) {
       return NextResponse.json(
         { message: `Outfit with ID ${id} not found` },
@@ -42,13 +34,8 @@ export async function GET(request: Request, { params }: Params) {
 export async function PUT(request: Request, { params }: Params) {
   const { id } = await params;
   try {
-    connectDB();
     const body = await request.json();
-    const updatedOutfit = await Outfit.findOneAndUpdate(
-      { id },
-      { $set: body },
-      { new: true, runValidators: true }
-    );
+    const updatedOutfit = await updateOutfitById(id, body);
     if (!updatedOutfit) {
       return NextResponse.json(
         { message: `Outfit with ID ${id} not found` },
@@ -68,8 +55,7 @@ export async function PUT(request: Request, { params }: Params) {
 export async function DELETE(request: Request, { params }: Params) {
   const { id } = await params;
   try {
-    connectDB();
-    const deletedOutfit = await Outfit.findOneAndDelete({ id });
+    const deletedOutfit = await deleteOutfitById(id);
     if (!deletedOutfit) {
       return NextResponse.json(
         { message: `Outfit with ID ${id} not found` },

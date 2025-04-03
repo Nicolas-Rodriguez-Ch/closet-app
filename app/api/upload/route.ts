@@ -1,16 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { v2 as cloudinary } from 'cloudinary';
-import {
-  CLOUDINARY_API_KEY,
-  CLOUDINARY_API_SECRET,
-  CLOUDINARY_CLOUD_NAME,
-} from '@/public/constants/secrets';
-
-cloudinary.config({
-  cloud_name: CLOUDINARY_CLOUD_NAME,
-  api_key: CLOUDINARY_API_KEY,
-  api_secret: CLOUDINARY_API_SECRET,
-});
+import { uploadToCloudinary } from '@/services/uploadService';
 
 export async function POST(request: NextRequest) {
   try {
@@ -29,20 +18,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-    const base64File = `data:${file.type};base64,${buffer.toString('base64')}`;
-
-    const result = await cloudinary.uploader.upload(base64File, {
-      folder: 'LookBook',
-      resource_type: 'image',
-    });
+    const result = await uploadToCloudinary(file);
 
     if (!result || !result.secure_url) {
       return NextResponse.json({ message: 'Upload failed' }, { status: 500 });
     }
     return NextResponse.json(
-      { message: 'Upload succesful', pictureURL: result.secure_url },
+      { message: 'Upload succesful', data: { ...result } },
       { status: 201 }
     );
   } catch (error) {

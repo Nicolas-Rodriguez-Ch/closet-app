@@ -1,14 +1,9 @@
-jest.mock('@/database/db', () => ({
-  __esModule: true,
-  default: jest.fn()
-}));
-
 import { GET, POST } from '../route';
-import Apparel from '@/database/models/apparel';
+import { createNewApparel, getAllApparel } from '@/services/apparelServices';
 
-jest.mock('@/database/models/apparel', () => ({
-  find: jest.fn(),
-  create: jest.fn(),
+jest.mock('@/services/apparelServices', () => ({
+  getAllApparel: jest.fn(),
+  createNewApparel: jest.fn(),
 }));
 
 jest.spyOn(console, 'error').mockImplementation(() => {});
@@ -42,22 +37,18 @@ describe('Apparel API Routes', () => {
         { id: '2', title: 'Black Pants', type: 'BOTTOM' },
       ];
 
-      (Apparel.find as jest.Mock).mockImplementation(() => ({
-        sort: jest.fn().mockResolvedValue(mockApparelItems),
-      }));
+      (getAllApparel as jest.Mock).mockResolvedValue(mockApparelItems);
 
       await GET();
 
-      expect(Apparel.find).toHaveBeenCalledWith({});
+      expect(getAllApparel).toHaveBeenCalled();
       expect(mockStatus).toHaveBeenCalledWith(200);
       expect(mockJsonResponse).toHaveBeenCalledWith(mockApparelItems);
     });
 
     it('should handle errors and return 500', async () => {
       const testError = new Error('Database error');
-      (Apparel.find as jest.Mock).mockImplementation(() => {
-        throw testError;
-      });
+      (getAllApparel as jest.Mock).mockRejectedValue(testError);
 
       await GET();
 
@@ -66,14 +57,13 @@ describe('Apparel API Routes', () => {
         message: 'Failed to fetch apparel items',
       });
     });
+
     it('should return 404 when no apparel items are found', async () => {
-      (Apparel.find as jest.Mock).mockImplementation(() => ({
-        sort: jest.fn().mockResolvedValue([]),
-      }));
+      (getAllApparel as jest.Mock).mockResolvedValue([]);
 
       await GET();
 
-      expect(Apparel.find).toHaveBeenCalledWith({});
+      expect(getAllApparel).toHaveBeenCalled();
       expect(mockStatus).toHaveBeenCalledWith(404);
       expect(mockJsonResponse).toHaveBeenCalledWith({
         message: 'No apparel items were found',
@@ -92,7 +82,7 @@ describe('Apparel API Routes', () => {
         description: 'A nice shirt',
       };
 
-      (Apparel.create as jest.Mock).mockResolvedValue(mockApparel);
+      (createNewApparel as jest.Mock).mockResolvedValue(mockApparel);
 
       const requestBody = {
         title: 'New Shirt',
@@ -108,7 +98,7 @@ describe('Apparel API Routes', () => {
       await POST(mockRequest as any);
 
       expect(mockRequest.json).toHaveBeenCalled();
-      expect(Apparel.create).toHaveBeenCalledWith(requestBody);
+      expect(createNewApparel).toHaveBeenCalledWith(requestBody);
       expect(mockStatus).toHaveBeenCalledWith(201);
       expect(mockJsonResponse).toHaveBeenCalledWith(mockApparel);
     });
@@ -126,7 +116,7 @@ describe('Apparel API Routes', () => {
       await POST(mockRequest as any);
 
       expect(mockRequest.json).toHaveBeenCalled();
-      expect(Apparel.create).not.toHaveBeenCalled();
+      expect(createNewApparel).not.toHaveBeenCalled();
       expect(mockStatus).toHaveBeenCalledWith(400);
       expect(mockJsonResponse).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -149,7 +139,7 @@ describe('Apparel API Routes', () => {
       await POST(mockRequest as any);
 
       expect(mockRequest.json).toHaveBeenCalled();
-      expect(Apparel.create).not.toHaveBeenCalled();
+      expect(createNewApparel).not.toHaveBeenCalled();
       expect(mockStatus).toHaveBeenCalledWith(400);
       expect(mockJsonResponse).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -160,9 +150,7 @@ describe('Apparel API Routes', () => {
 
     it('should handle errors and return 500', async () => {
       const testError = new Error('Database error');
-      (Apparel.create as jest.Mock).mockImplementation(() => {
-        throw testError;
-      });
+      (createNewApparel as jest.Mock).mockRejectedValue(testError);
 
       const requestBody = {
         title: 'New Shirt',
@@ -177,6 +165,7 @@ describe('Apparel API Routes', () => {
       await POST(mockRequest as any);
 
       expect(mockRequest.json).toHaveBeenCalled();
+      expect(createNewApparel).toHaveBeenCalledWith(requestBody);
       expect(mockStatus).toHaveBeenCalledWith(500);
       expect(mockJsonResponse).toHaveBeenCalledWith({
         message: 'Failed to create Apparel item',

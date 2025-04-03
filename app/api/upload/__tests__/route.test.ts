@@ -1,19 +1,8 @@
 import { POST } from '../route';
-import { v2 as cloudinary } from 'cloudinary';
+import { uploadToCloudinary } from '@/services/uploadService';
 
-jest.mock('cloudinary', () => ({
-  v2: {
-    config: jest.fn(),
-    uploader: {
-      upload: jest.fn(),
-    },
-  },
-}));
-
-jest.mock('@/public/constants/secrets', () => ({
-  CLOUDINARY_CLOUD_NAME: 'test_cloud_name',
-  CLOUDINARY_API_KEY: 'test_api_key',
-  CLOUDINARY_API_SECRET: 'test_api_secret',
+jest.mock('@/services/uploadService', () => ({
+  uploadToCloudinary: jest.fn(),
 }));
 
 jest.spyOn(console, 'error').mockImplementation(() => {});
@@ -84,7 +73,7 @@ describe('Upload API Route', () => {
     expect(mockJsonResponse).toHaveBeenCalledWith({
       message: 'Only image files are allowed',
     });
-    expect(cloudinary.uploader.upload).not.toHaveBeenCalled();
+    expect(uploadToCloudinary).not.toHaveBeenCalled();
   });
 
   it('should upload image file to Cloudinary and return URL', async () => {
@@ -105,29 +94,21 @@ describe('Upload API Route', () => {
 
     const mockCloudinaryResult = {
       secure_url: 'https://res.cloudinary.com/demo/image/upload/test.jpg',
-      public_id: 'LookBook/test',
+      public_id: 'lookbook/test',
     };
 
-    (cloudinary.uploader.upload as jest.Mock).mockResolvedValue(
-      mockCloudinaryResult
-    );
+    (uploadToCloudinary as jest.Mock).mockResolvedValue(mockCloudinaryResult);
 
     await POST(mockRequest as any);
 
     expect(mockRequest.formData).toHaveBeenCalled();
     expect(mockFormData.get).toHaveBeenCalledWith('file');
-    expect(cloudinary.uploader.upload).toHaveBeenCalledWith(
-      expect.stringContaining('data:image/jpeg;base64,'),
-      {
-        folder: 'LookBook',
-        resource_type: 'image',
-      }
-    );
+    expect(uploadToCloudinary).toHaveBeenCalledWith(mockFile);
 
     expect(mockStatus).toHaveBeenCalledWith(201);
     expect(mockJsonResponse).toHaveBeenCalledWith({
       message: 'Upload succesful',
-      pictureURL: mockCloudinaryResult.secure_url,
+      data: mockCloudinaryResult,
     });
   });
 
@@ -148,14 +129,14 @@ describe('Upload API Route', () => {
     };
 
     const invalidResult = {
-      public_id: 'LookBook/test',
+      public_id: 'lookbook/test',
     };
 
-    (cloudinary.uploader.upload as jest.Mock).mockResolvedValue(invalidResult);
+    (uploadToCloudinary as jest.Mock).mockResolvedValue(invalidResult);
 
     await POST(mockRequest as any);
 
-    expect(cloudinary.uploader.upload).toHaveBeenCalled();
+    expect(uploadToCloudinary).toHaveBeenCalledWith(mockFile);
     expect(mockStatus).toHaveBeenCalledWith(500);
     expect(mockJsonResponse).toHaveBeenCalledWith({
       message: 'Upload failed',
@@ -180,12 +161,12 @@ describe('Upload API Route', () => {
 
     const testError = new Error('Upload failed');
 
-    (cloudinary.uploader.upload as jest.Mock).mockRejectedValue(testError);
+    (uploadToCloudinary as jest.Mock).mockRejectedValue(testError);
 
     await POST(mockRequest as any);
 
     expect(mockRequest.formData).toHaveBeenCalled();
-    expect(cloudinary.uploader.upload).toHaveBeenCalled();
+    expect(uploadToCloudinary).toHaveBeenCalledWith(mockFile);
     expect(console.error).toHaveBeenCalled();
     expect(mockStatus).toHaveBeenCalledWith(500);
     expect(mockJsonResponse).toHaveBeenCalledWith({

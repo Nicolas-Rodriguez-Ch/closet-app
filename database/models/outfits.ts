@@ -57,6 +57,10 @@ const OutfitSchema = new Schema<IOutfit>(
         required: true,
       },
     ],
+    description: {
+      type: String,
+      required: false,
+    },
   },
   {
     timestamps: true,

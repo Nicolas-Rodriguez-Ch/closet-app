@@ -1,11 +1,9 @@
-import connectDB from '@/database/db';
-import Apparel from '@/database/models/apparel';
+import { createNewApparel, getAllApparel } from '@/services/apparelServices';
 import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
-    connectDB();
-    const apparels = await Apparel.find({}).sort({ updatedAt: -1 });
+    const apparels = await getAllApparel();
     if (!apparels.length) {
       return NextResponse.json(
         { message: 'No apparel items were found', data: [] },
@@ -24,7 +22,6 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    connectDB();
     const body = await request.json();
 
     if (!body.title || !body.pictureURL || !body.type) {
@@ -44,7 +41,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const newApparel = await Apparel.create(body);
+    const newApparel = await createNewApparel(body);
     return NextResponse.json(newApparel, { status: 201 });
   } catch (error) {
     console.error('Error creating apparel item: ', error);
