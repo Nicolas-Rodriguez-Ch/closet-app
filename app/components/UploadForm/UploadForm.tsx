@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import React, { ChangeEvent, FormEvent, useState } from 'react';
 enum ApparelTypeEnum {
   TOP = 'TOP',
@@ -14,6 +15,7 @@ const UploadForm = () => {
     apparelDescription: '',
     apparelType: ApparelTypeEnum.TOP,
   });
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -31,13 +33,46 @@ const UploadForm = () => {
     }));
   };
 
+  const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+    }
+  };
+
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log(e);
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className='flex flex-col gap-3.5 p-3.5 justify-center content-center md:w-1/2'>
+      <section className='flex flex-col gap-3 p-3'>
+        <label htmlFor='imageUpload' className='cursor-pointer'>
+          Upload Apparel Image
+        </label>
+        <input
+          type='file'
+          id='imageUpload'
+          name='imageUpload'
+          accept='image/*'
+          onChange={handleImageUpload}
+          max-size='10485760'
+          className='cursor-pointer'
+        />
+        {imageFile && (
+          <div className='mt-3 flex justify-center'>
+            <Image
+              src={URL.createObjectURL(imageFile)}
+              alt='Image preview'
+              width={320}
+              height={256}
+              unoptimized={false}
+              style={{ objectFit: 'contain' }}
+            />
+          </div>
+        )}
+      </section>
       <section className='flex flex-col gap-3 p-3'>
         <label htmlFor='apparelTitle' className='cursor-pointer'>
           Apparel Item Title

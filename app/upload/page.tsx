@@ -3,8 +3,7 @@ import UploadForm from '../components/UploadForm/UploadForm';
 
 const Upload = () => {
   return (
-    <div>
-      Upload
+    <div className='flex justify-center'>
       <UploadForm />
     </div>
   );
