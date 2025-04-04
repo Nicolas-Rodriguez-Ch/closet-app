@@ -2,8 +2,8 @@
 
 import Image from 'next/image';
 import React, { ChangeEvent, FormEvent, useState, useRef } from 'react';
-import { ApparelForm, ApparelTypeEnum } from './utils/types';
-import { orchestrateApparelSubmit } from './utils/submitHelper';
+import { ApparelForm, ApparelTypeEnum } from '../../../services/types';
+import { orchestrateApparelSubmit } from '../../../services/orchestarteApparelSubmit';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 

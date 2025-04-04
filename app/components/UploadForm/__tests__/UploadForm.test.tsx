@@ -1,10 +1,10 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import UploadForm from '../UploadForm';
-import { orchestrateApparelSubmit } from '../utils/submitHelper';
+import { orchestrateApparelSubmit } from '../../../../services/orchestarteApparelSubmit';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 
-jest.mock('../utils/submitHelper', () => ({
+jest.mock('../../../../services/orchestarteApparelSubmit', () => ({
   orchestrateApparelSubmit: jest.fn(),
 }));
 

@@ -1,8 +1,10 @@
+import { ApparelTypeEnum } from '@/services/types';
+
 export interface IApparel {
   id: string;
   title: string;
   pictureURL: string;
-  type: 'TOP' | 'BOTTOM' | 'SHOES' | 'COAT';
+  type: ApparelTypeEnum;
   description?: string;
   createdAt: string;
   updatedAt: string;
