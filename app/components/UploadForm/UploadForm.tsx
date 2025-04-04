@@ -95,14 +95,15 @@ const UploadForm = () => {
 
     try {
       if (imageFile) {
-        const result = await orchestrateApparelSubmit(imageFile, formData);
-
-        if (result?.success === false) {
-          toast.error(`Upload failed: ${result.error || 'Unknown error'}`);
-          setIsSubmitting(false);
-          return;
-        }
-        toast.success('Apparel item uploaded successfully!');
+        await toast.promise(orchestrateApparelSubmit(imageFile, formData), {
+          pending: 'Uploading your Apparel Item',
+          success: 'Apparel Item uploaded successfully!',
+          error: {
+            render({ data }: any) {
+              return `Error uploading apparel item: ${data?.error}`;
+            },
+          },
+        });
         setFormData({
           apparelTitle: '',
           apparelDescription: '',
