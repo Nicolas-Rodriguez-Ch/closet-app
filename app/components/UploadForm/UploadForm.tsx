@@ -142,12 +142,19 @@ const UploadForm = () => {
   return (
     <form
       onSubmit={handleSubmit}
-      className='flex flex-col gap-3.5 p-3.5 justify-center content-center md:w-1/2'
+      className='flex flex-col gap-3.5 p-4 md:p-6 justify-center content-center w-full max-w-md mx-auto md:max-w-lg lg:max-w-xl bg-palette-3 rounded-lg shadow-md'
       aria-label='Apparel upload form'
     >
-      <section className='flex flex-col gap-3 p-3'>
-        <label htmlFor='imageUpload' className='cursor-pointer'>
-          Upload Apparel Image <span className='text-red-500'>*</span>
+      <h2 className='text-xl md:text-2xl font-bold text-palette-2 mb-2 text-center'>
+        Add New Apparel
+      </h2>
+
+      <section className='flex flex-col gap-3 p-5 bg-white bg-opacity-70 rounded-3xl'>
+        <label
+          htmlFor='imageUpload'
+          className='cursor-pointer font-medium text-palette-2 mb-3'
+        >
+          Upload Apparel Image <span className='text-palette-5'>*</span>
         </label>
         <input
           type='file'
@@ -155,7 +162,7 @@ const UploadForm = () => {
           name='imageUpload'
           accept='image/*'
           onChange={handleImageUpload}
-          className={`cursor-pointer ${
+          className={`cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-palette-1 file:text-palette-3 hover:file:bg-palette-2 ${
             validationErrors.imageFile ? 'border-red-500' : ''
           }`}
           aria-required='true'
@@ -166,7 +173,10 @@ const UploadForm = () => {
           disabled={isSubmitting}
         />
         {validationErrors.imageFile && (
-          <p id='imageUpload-error' className='text-red-500 text-sm mt-1'>
+          <p
+            id='imageUpload-error'
+            className='text-palette-5 text-sm font-bold mt-1'
+          >
             {validationErrors.imageFile}
           </p>
         )}
@@ -182,9 +192,12 @@ const UploadForm = () => {
           </div>
         )}
       </section>
-      <section className='flex flex-col gap-3 p-3'>
-        <label htmlFor='apparelTitle' className='cursor-pointer'>
-          Apparel Item Title <span className='text-red-500'>*</span>
+      <section className='flex flex-col gap-3 p-5 bg-white bg-opacity-70 rounded-3xl'>
+        <label
+          htmlFor='apparelTitle'
+          className='cursor-pointer font-medium text-palette-2 mb-3'
+        >
+          Apparel Item Title <span className='text-palette-5'>*</span>
         </label>
         <input
           type='text'
@@ -193,8 +206,10 @@ const UploadForm = () => {
           placeholder='Title of this Apparel item'
           value={formData.apparelTitle}
           onChange={handleChange}
-          className={`p-2 border rounded ${
-            validationErrors.apparelTitle ? 'border-red-500' : 'border-gray-300'
+          className={`p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-palette-4 text-palette-2 ${
+            validationErrors.apparelTitle
+              ? 'border-palette-5'
+              : 'border-palette-1'
           }`}
           aria-required='true'
           aria-invalid={!!validationErrors.apparelTitle}
@@ -204,13 +219,20 @@ const UploadForm = () => {
           disabled={isSubmitting}
         />
         {validationErrors.apparelTitle && (
-          <p id='apparelTitle-error' className='text-red-500 text-sm mt-1'>
+          <p
+            id='apparelTitle-error'
+            className='text-palette-5 text-sm font-bold mt-1'
+          >
             {validationErrors.apparelTitle}
           </p>
         )}
       </section>
-      <section className='flex flex-col gap-3 p-3'>
-        <label htmlFor='apparelDescription' className='cursor-pointer'>
+
+      <section className='flex flex-col gap-3 p-5 bg-white bg-opacity-70 rounded-3xl'>
+        <label
+          htmlFor='apparelDescription'
+          className='cursor-pointer font-medium text-palette-2 mb-3'
+        >
           Apparel Description
         </label>
         <input
@@ -220,20 +242,24 @@ const UploadForm = () => {
           placeholder='Optional description for this Apparel Item'
           value={formData.apparelDescription}
           onChange={handleChange}
-          className='p-2 border border-gray-300 rounded'
+          className='p-2 border border-palette-1 rounded-md focus:outline-none focus:ring-2 focus:ring-palette-4'
           disabled={isSubmitting}
         />
       </section>
-      <section className='flex flex-col gap-3 p-3'>
-        <label htmlFor='apparelType' className='cursor-pointer'>
-          Apparel Type <span className='text-red-500'>*</span>
+
+      <section className='flex flex-col gap-3 p-5 bg-white bg-opacity-70 rounded-3xl'>
+        <label
+          htmlFor='apparelType'
+          className='cursor-pointer font-medium text-palette-2 mb-3'
+        >
+          Apparel Type <span className='text-palette-5'>*</span>
         </label>
         <select
           id='apparelType'
           name='apparelType'
           value={formData.apparelType}
           onChange={handleOptionChange}
-          className='p-2 border border-gray-300 rounded'
+          className='p-2 border border-palette-1 rounded-md focus:outline-none focus:ring-2 focus:ring-palette-4 bg-white'
           aria-required='true'
           disabled={isSubmitting}
         >
@@ -244,13 +270,14 @@ const UploadForm = () => {
           ))}
         </select>
       </section>
+
       <button
         type='submit'
         disabled={isSubmitting}
-        className={`p-3 rounded-md text-white font-medium transition-colors ${
+        className={`p-3 mt-2 rounded-md text-white font-medium transition-colors ${
           isSubmitting
-            ? 'bg-gray-400 cursor-not-allowed'
-            : 'bg-blue-600 hover:bg-blue-700'
+            ? 'bg-palette-1 opacity-60 cursor-not-allowed'
+            : 'bg-palette-5 hover:bg-palette-2'
         }`}
         aria-busy={isSubmitting}
       >
