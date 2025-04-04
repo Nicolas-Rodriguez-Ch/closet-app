@@ -5,8 +5,10 @@ import React, { ChangeEvent, FormEvent, useState, useRef } from 'react';
 import { ApparelForm, ApparelTypeEnum } from './utils/types';
 import { orchestrateApparelSubmit } from './utils/sumbitHelper';
 import { toast } from 'react-toastify';
+import { useRouter } from 'next/navigation';
 
 const UploadForm = () => {
+  const router = useRouter();
   const [formData, setFormData] = useState<ApparelForm>({
     apparelTitle: '',
     apparelDescription: '',
@@ -122,6 +124,7 @@ const UploadForm = () => {
         if (fileInput) {
           fileInput.value = '';
         }
+        router.push('/');
       }
     } catch (error) {
       console.error('Form submission error:', error);
