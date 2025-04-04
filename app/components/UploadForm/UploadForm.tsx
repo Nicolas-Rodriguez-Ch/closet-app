@@ -4,6 +4,7 @@ import Image from 'next/image';
 import React, { ChangeEvent, FormEvent, useState } from 'react';
 import { ApparelForm, ApparelTypeEnum } from './utils/types';
 import { orchestrateApparelSubmit } from './utils/sumbitHelper';
+import { toast } from 'react-toastify';
 
 const UploadForm = () => {
   const [formData, setFormData] = useState<ApparelForm>({
@@ -41,6 +42,7 @@ const UploadForm = () => {
     if (imageFile) {
       const result = await orchestrateApparelSubmit(imageFile, formData);
       if (result) {
+        toast.success('Apparel item uploaded succesfully!',);
         setFormData({
           apparelTitle: '',
           apparelDescription: '',
