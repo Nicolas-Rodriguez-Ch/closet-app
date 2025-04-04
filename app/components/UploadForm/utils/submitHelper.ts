@@ -27,10 +27,6 @@ export const orchestrateApparelSubmit = async (
       throw new Error('Missing secure_url in upload response');
     }
 
-    if (!secure_url) {
-      throw new Error('Missing secure_url in upload response');
-    }
-
     const body = {
       pictureURL: secure_url,
       title: params.apparelTitle,
