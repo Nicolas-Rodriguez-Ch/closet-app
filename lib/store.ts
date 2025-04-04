@@ -1,8 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
+import apparelReducer from './features/apparel/apparelSlice';
 
 export const makeStore = () => {
   return configureStore({
-    reducer: {},
+    reducer: {
+      apparel: apparelReducer,
+    },
     devTools: process.env.NODE_ENV !== 'production',
   });
 };
