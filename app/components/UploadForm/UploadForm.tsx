@@ -39,7 +39,15 @@ const UploadForm = () => {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (imageFile) {
-      await orchestrateApparelSubmit(imageFile, formData);
+      const result = await orchestrateApparelSubmit(imageFile, formData);
+      if (result) {
+        setFormData({
+          apparelTitle: '',
+          apparelDescription: '',
+          apparelType: ApparelTypeEnum.TOP,
+        });
+        setImageFile(null);
+      }
     }
   };
 

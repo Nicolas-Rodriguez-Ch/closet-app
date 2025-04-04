@@ -6,6 +6,6 @@ export enum ApparelTypeEnum {
 }
 export interface ApparelForm {
   apparelTitle: string;
-  apparelDescription: string;
+  apparelDescription?: string;
   apparelType: ApparelTypeEnum;
 }
