@@ -12,11 +12,13 @@
     "test:coverage": "jest --coverage"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^2.6.1",
     "cloudinary": "^2.6.0",
     "mongoose": "^8.13.1",
     "next": "15.2.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-redux": "^9.2.0",
     "react-toastify": "^11.0.5",
     "uuid": "^11.1.0"
   },

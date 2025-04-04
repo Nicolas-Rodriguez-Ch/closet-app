@@ -29,7 +29,7 @@ const config = {
     '!**/jest.*.js',
     '!**/*.config.*',
     '!app/layout.tsx',
-    '!app/lib/fonts.ts'
+    '!./lib/fonts.ts'
   ],
   coveragePathIgnorePatterns: ['/node_modules/', '/coverage/'],
 };

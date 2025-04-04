@@ -1,7 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import Home from '../page';
 
-jest.spyOn(console, 'log').mockImplementation(() => {});
 
 describe('Home Page', () => {
   it('renders the home page with correct content', () => {
@@ -12,7 +11,6 @@ describe('Home Page', () => {
     const article = screen.getByRole('article');
     expect(article).toBeInTheDocument();
     
-    expect(console.log).toHaveBeenCalledWith('im i in the client or the server?');
   });
   
   it('has the correct styling', () => {
