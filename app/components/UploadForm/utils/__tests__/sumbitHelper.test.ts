@@ -1,4 +1,4 @@
-import { orchestrateApparelSubmit } from '../sumbitHelper';
+import { orchestrateApparelSubmit } from '../submitHelper';
 import { ApparelTypeEnum } from '../types';
 import { API_URL } from '@/public/constants/secrets';
 
