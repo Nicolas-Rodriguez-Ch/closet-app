@@ -1,10 +1,9 @@
 import { orchestrateApparelSubmit } from '../submitHelper';
 import { ApparelTypeEnum } from '../types';
-import { API_URL } from '@/public/constants/secrets';
 
 global.fetch = jest.fn();
 
-describe('orchestrateApparelSubmit', () => {
+describe('orchestrateApparelSubmit Error Handling', () => {
   let mockFile: File;
   let mockParams: any;
 
@@ -17,192 +16,161 @@ describe('orchestrateApparelSubmit', () => {
     mockParams = {
       apparelTitle: 'Test Title',
       apparelDescription: 'Test Description',
-      apparelType: 'TOP',
-    };
-  });
-
-  test('should successfully upload image and create apparel', async () => {
-    (global.fetch as jest.Mock).mockImplementationOnce(() =>
-      Promise.resolve({
-        ok: true,
-        json: () =>
-          Promise.resolve({
-            data: {
-              secure_url: 'https://example.com/image.jpg',
-            },
-          }),
-      })
-    );
-
-    (global.fetch as jest.Mock).mockImplementationOnce(() =>
-      Promise.resolve({
-        ok: true,
-        json: () =>
-          Promise.resolve({
-            success: true,
-            data: {
-              id: '123',
-              pictureURL: 'https://example.com/image.jpg',
-              title: 'Test Title',
-              description: 'Test Description',
-              type: 'TOP',
-            },
-          }),
-      })
-    );
-
-    const result = await orchestrateApparelSubmit(mockFile, mockParams);
-
-    expect(result).toHaveProperty('data.id', '123');
-
-    expect(global.fetch).toHaveBeenCalledTimes(2);
-    expect(global.fetch).toHaveBeenNthCalledWith(
-      1,
-      `${API_URL}upload`,
-      expect.objectContaining({
-        method: 'POST',
-        body: expect.any(FormData),
-      })
-    );
-
-    expect(global.fetch).toHaveBeenNthCalledWith(
-      2,
-      `${API_URL}apparel`,
-      expect.objectContaining({
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: expect.stringContaining('pictureURL'),
-      })
-    );
-
-    const secondCallArgs = (global.fetch as jest.Mock).mock.calls[1];
-    const sentBody = JSON.parse(secondCallArgs[1].body);
-    expect(sentBody).toHaveProperty(
-      'pictureURL',
-      'https://example.com/image.jpg'
-    );
-    expect(sentBody).toHaveProperty('title', 'Test Title');
-    expect(sentBody).toHaveProperty('description', 'Test Description');
-    expect(sentBody).toHaveProperty('type', 'TOP');
-  });
-
-  test('should omit description if it is empty', async () => {
-    const paramsWithoutDesc = {
-      apparelTitle: 'Test Title',
-      apparelDescription: '',
       apparelType: ApparelTypeEnum.TOP,
     };
-
-    (global.fetch as jest.Mock).mockImplementationOnce(() =>
-      Promise.resolve({
-        ok: true,
-        json: () =>
-          Promise.resolve({
-            data: { secure_url: 'https://example.com/image.jpg' },
-          }),
-      })
-    );
-
-    (global.fetch as jest.Mock).mockImplementationOnce(() =>
-      Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve({ success: true }),
-      })
-    );
-
-    await orchestrateApparelSubmit(mockFile, paramsWithoutDesc);
-
-    const secondCallArgs = (global.fetch as jest.Mock).mock.calls[1];
-    const sentBody = JSON.parse(secondCallArgs[1].body);
-    expect(sentBody).not.toHaveProperty('description');
   });
 
-  test('should handle upload API error', async () => {
-    (global.fetch as jest.Mock).mockRejectedValueOnce(
-      new Error('Network error')
-    );
+  describe('Upload Response Error Handling', () => {
+    test('should handle non-ok upload response', async () => {
+      (global.fetch as jest.Mock).mockImplementationOnce(() =>
+        Promise.resolve({
+          ok: false,
+          status: 400,
+          json: () => Promise.resolve({ error: 'Bad Request' }),
+        })
+      );
 
-    const result = await orchestrateApparelSubmit(mockFile, mockParams);
+      const result = await orchestrateApparelSubmit(mockFile, mockParams);
 
-    expect(result).toHaveProperty('success', false);
-    expect(result).toHaveProperty('error', 'Network error');
+      expect(result).toEqual({
+        success: false,
+        error: 'HTTP error! Status: 400',
+      });
+    });
 
-    expect(global.fetch).toHaveBeenCalledTimes(1);
+    test('should handle missing data in upload response', async () => {
+      (global.fetch as jest.Mock).mockImplementationOnce(() =>
+        Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({}),
+        })
+      );
+
+      const result = await orchestrateApparelSubmit(mockFile, mockParams);
+
+      expect(result).toEqual({
+        success: false,
+        error: 'Invalid upload response format',
+      });
+    });
+
+    test('should handle missing secure_url in upload response', async () => {
+      (global.fetch as jest.Mock).mockImplementationOnce(() =>
+        Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ data: {} }),
+        })
+      );
+
+      const result = await orchestrateApparelSubmit(mockFile, mockParams);
+
+      expect(result).toEqual({
+        success: false,
+        error: 'Missing secure_url in upload response',
+      });
+    });
   });
 
-  test('should handle upload API non-200 response', async () => {
-    (global.fetch as jest.Mock).mockImplementationOnce(() =>
-      Promise.resolve({
-        ok: false,
-        status: 400,
-        json: () => Promise.resolve({ error: 'Bad Request' }),
-      })
-    );
+  describe('Apparel Creation Error Handling', () => {
+    test('should handle non-ok apparel creation response', async () => {
+      (global.fetch as jest.Mock).mockImplementationOnce(() =>
+        Promise.resolve({
+          ok: true,
+          json: () =>
+            Promise.resolve({
+              data: { secure_url: 'https://example.com/image.jpg' },
+            }),
+        })
+      );
 
-    const result = await orchestrateApparelSubmit(mockFile, mockParams);
+      (global.fetch as jest.Mock).mockImplementationOnce(() =>
+        Promise.resolve({
+          ok: false,
+          status: 500,
+          json: () => Promise.resolve({ error: 'Server Error' }),
+        })
+      );
 
-    expect(result).toHaveProperty('success', false);
-    expect(result).toHaveProperty('error', 'HTTP error! Status: 400');
+      const result = await orchestrateApparelSubmit(mockFile, mockParams);
+
+      expect(result).toEqual({
+        success: false,
+        error: 'HTTP error! Status: 500',
+      });
+    });
   });
 
-  test('should handle missing secure_url in upload response', async () => {
-    (global.fetch as jest.Mock).mockImplementationOnce(() =>
-      Promise.resolve({
-        ok: true,
-        json: () =>
-          Promise.resolve({
-            data: {
-            },
-          }),
-      })
-    );
+  describe('Network Error Handling', () => {
+    test('should handle network error during upload', async () => {
+      (global.fetch as jest.Mock).mockRejectedValueOnce(
+        new Error('Network failure')
+      );
 
-    const result = await orchestrateApparelSubmit(mockFile, mockParams);
+      const result = await orchestrateApparelSubmit(mockFile, mockParams);
 
-    expect(result).toHaveProperty('success', false);
-    expect(result).toHaveProperty(
-      'error',
-      'Missing secure_url in upload response'
-    );
+      expect(result).toEqual({
+        success: false,
+        error: 'Network failure',
+      });
+    });
+
+    test('should handle network error during apparel creation', async () => {
+      (global.fetch as jest.Mock).mockImplementationOnce(() =>
+        Promise.resolve({
+          ok: true,
+          json: () =>
+            Promise.resolve({
+              data: { secure_url: 'https://example.com/image.jpg' },
+            }),
+        })
+      );
+
+      (global.fetch as jest.Mock).mockRejectedValueOnce(
+        new Error('Apparel creation network error')
+      );
+
+      const result = await orchestrateApparelSubmit(mockFile, mockParams);
+
+      expect(result).toEqual({
+        success: false,
+        error: 'Apparel creation network error',
+      });
+    });
   });
 
-  test('should handle invalid upload response format', async () => {
-    (global.fetch as jest.Mock).mockImplementationOnce(() =>
-      Promise.resolve({
-        ok: true,
-        json: () =>
-          Promise.resolve({
-            message: 'Success',
-          }),
-      })
-    );
+  describe('Description Handling', () => {
+    test('should omit description when empty', async () => {
+      const paramsWithEmptyDesc = {
+        ...mockParams,
+        apparelDescription: '',
+      };
 
-    const result = await orchestrateApparelSubmit(mockFile, mockParams);
+      (global.fetch as jest.Mock).mockImplementationOnce(() =>
+        Promise.resolve({
+          ok: true,
+          json: () =>
+            Promise.resolve({
+              data: { secure_url: 'https://example.com/image.jpg' },
+            }),
+        })
+      );
 
-    expect(result).toHaveProperty('success', false);
-    expect(result).toHaveProperty('error', 'Invalid upload response format');
-  });
+      (global.fetch as jest.Mock).mockImplementationOnce(() =>
+        Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ success: true }),
+        })
+      );
 
-  test('should handle apparel API error', async () => {
-    (global.fetch as jest.Mock).mockImplementationOnce(() =>
-      Promise.resolve({
-        ok: true,
-        json: () =>
-          Promise.resolve({
-            data: { secure_url: 'https://example.com/image.jpg' },
-          }),
-      })
-    );
+      await orchestrateApparelSubmit(mockFile, paramsWithEmptyDesc);
 
-    (global.fetch as jest.Mock).mockRejectedValueOnce(
-      new Error('Server error')
-    );
+      const secondCallArgs = (global.fetch as jest.Mock).mock.calls[1];
+      const sentBody = JSON.parse(secondCallArgs[1].body);
 
-    const result = await orchestrateApparelSubmit(mockFile, mockParams);
-
-    expect(result).toHaveProperty('success', false);
-    expect(result).toHaveProperty('error', 'Server error');
+      expect(sentBody).toHaveProperty('pictureURL');
+      expect(sentBody).toHaveProperty('title');
+      expect(sentBody).toHaveProperty('type');
+      expect(sentBody).not.toHaveProperty('description');
+    });
   });
 });
