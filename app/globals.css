@@ -6,4 +6,11 @@
   --color-palette-3: #fefae0;
   --color-palette-4: #dda15e;
   --color-palette-5: #bc6c25;
+  --font-feligne: 'Feligne', system-ui, sans-serif;
+}
+
+@layer base {
+  :root {
+    font-family: var(--font-feligne);
+  }
 }
