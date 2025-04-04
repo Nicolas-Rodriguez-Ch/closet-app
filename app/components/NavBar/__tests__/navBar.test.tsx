@@ -14,24 +14,26 @@ describe('NavBar Component', () => {
 
   it('renders logo and navigation links', () => {
     (nextNavigation.usePathname as jest.Mock).mockReturnValue('/');
-    
+
     render(<NavBar />);
-    
+
     expect(screen.getByText('LookBook')).toBeInTheDocument();
     expect(screen.getByText('Saved Outfits')).toBeInTheDocument();
-    expect(screen.getByText('Theme')).toBeInTheDocument();
+    expect(screen.getByText('Upload Apparel')).toBeInTheDocument();
   });
 
   it('highlights the active link based on current path', () => {
     (nextNavigation.usePathname as jest.Mock).mockReturnValue('/outfits');
-    
+
     render(<NavBar />);
-    
 
     const outfitsLink = screen.getByText('Saved Outfits').closest('a');
     expect(outfitsLink).toHaveClass('before:w-full');
-    
+
     const homeLink = screen.getByText('LookBook').closest('a');
     expect(homeLink).toHaveClass('before:w-0');
+
+    const uploadLink = screen.getByText('Upload Apparel').closest('a');
+    expect(uploadLink).toHaveClass('before:w-0');
   });
 });
