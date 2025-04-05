@@ -225,6 +225,81 @@ describe('apparel slice', () => {
         expect(state.status).toBe('failed');
         expect(state.error).toBe('Service exception');
       });
+
+      it('should handle HTTP error in updateApparel thunk and pass error to rejectWithValue', async () => {
+        // Mock the fetch to return a non-ok response to trigger the throw 
+        (global.fetch as jest.Mock).mockResolvedValueOnce({
+          ok: false,
+          status: 403,
+          json: jest.fn() // This won't be called because the error is thrown first
+        });
+        
+        // Create a mockThunkAPI to verify rejectWithValue is called with the right arguments
+        const mockRejectWithValue = jest.fn().mockImplementation(val => `rejected:${val}`);
+        const mockThunkAPI = { rejectWithValue: mockRejectWithValue };
+        
+        // Call the thunk directly to test its internal logic
+        const result = await updateApparel({ 
+          id: 'test-id', 
+          body: { title: 'Test' } 
+        })(jest.fn(), () => ({}), mockThunkAPI);
+        
+        // Verify fetch was called with correct arguments
+        expect(global.fetch).toHaveBeenCalledWith(
+          'http://mock-api/apparel/test-id',
+          expect.objectContaining({
+            method: 'PUT',
+            body: JSON.stringify({ title: 'Test' })
+          })
+        );
+        
+        // Verify rejectWithValue was called with the error message
+        expect(mockRejectWithValue).toHaveBeenCalledWith('HTTP Error! Status: 403');
+        
+        // Verify the result is what rejectWithValue returned
+        expect(result).toBe('rejected:HTTP Error! Status: 403');
+      });
+      
+      it('should handle network error in updateApparel thunk', async () => {
+        // Mock fetch to throw a network error
+        const networkError = new Error('Network failure');
+        (global.fetch as jest.Mock).mockRejectedValueOnce(networkError);
+        
+        // Create a mockThunkAPI to verify rejectWithValue is called with the right arguments
+        const mockRejectWithValue = jest.fn().mockImplementation(val => `rejected:${val}`);
+        const mockThunkAPI = { rejectWithValue: mockRejectWithValue };
+        
+        // Call the thunk directly
+        const result = await updateApparel({ 
+          id: 'test-id', 
+          body: { title: 'Test' } 
+        })(jest.fn(), () => ({}), mockThunkAPI);
+        
+        // Verify rejectWithValue was called with the error message
+        expect(mockRejectWithValue).toHaveBeenCalledWith('Network failure');
+        
+        // Verify the result is what rejectWithValue returned
+        expect(result).toBe('rejected:Network failure');
+      });
+      
+      it('should handle successful json parsing in updateApparel thunk', async () => {
+        const updatedData = { id: 'test-id', title: 'Updated', type: 'TOP' };
+        
+        // Mock a successful response
+        (global.fetch as jest.Mock).mockResolvedValueOnce({
+          ok: true,
+          json: jest.fn().mockResolvedValueOnce(updatedData)
+        });
+        
+        // Call the thunk directly
+        const result = await updateApparel({ 
+          id: 'test-id', 
+          body: { title: 'Updated' } 
+        })(jest.fn(), () => ({}), {} as any);
+        
+        // Verify the thunk returns the parsed data
+        expect(result).toEqual(updatedData);
+      });
     });
     
     describe('updateApparel', () => {
