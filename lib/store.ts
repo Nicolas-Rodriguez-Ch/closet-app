@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import apparelReducer from './features/apparel/apparelSlice';
-import outfitReducer from './features/outfit/ouffitSlice';
+import outfitReducer from './features/outfit/outfitSlice';
 
 export const makeStore = () => {
   return configureStore({
