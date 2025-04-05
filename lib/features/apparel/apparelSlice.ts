@@ -65,7 +65,7 @@ export const updateApparel = createAsyncThunk(
       }
       return await result.json();
     } catch (error) {
-      rejectWithValue((error as Error).message || 'Failed to update.');
+      return rejectWithValue((error as Error).message || 'Failed to update.');
     }
   }
 );
@@ -171,7 +171,7 @@ const apparelSlice = createSlice({
       .addCase(deleteApparel.pending, (state) => {
         state.status = 'loading';
       })
-      .addCase(updateApparel.fulfilled, (state, action) => {
+      .addCase(deleteApparel.fulfilled, (state, action) => {
         state.status = 'succeeded';
         const categories = ['TOP', 'BOTTOM', 'SHOES', 'COAT'] as const;
         categories.forEach((category) => {
