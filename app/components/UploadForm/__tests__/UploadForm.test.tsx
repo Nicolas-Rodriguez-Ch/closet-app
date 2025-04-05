@@ -5,13 +5,11 @@ import { useRouter } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { uploadApparel } from '@/lib/features/apparel/apparelSlice';
 
-// Mock Redux hooks
 jest.mock('@/lib/hooks', () => ({
   useAppDispatch: jest.fn(),
   useAppSelector: jest.fn(),
 }));
 
-// Mock Redux actions
 jest.mock('@/lib/features/apparel/apparelSlice', () => ({
   uploadApparel: jest.fn(),
 }));
