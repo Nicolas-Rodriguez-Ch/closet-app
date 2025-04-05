@@ -1,10 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit';
 import apparelReducer from './features/apparel/apparelSlice';
+import outfitReducer from './features/outfit/ouffitSlice';
 
 export const makeStore = () => {
   return configureStore({
     reducer: {
       apparel: apparelReducer,
+      outfit: outfitReducer,
     },
     devTools: process.env.NODE_ENV !== 'production',
   });

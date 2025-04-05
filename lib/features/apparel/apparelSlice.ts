@@ -72,7 +72,7 @@ export const updateApparel = createAsyncThunk(
 
 export const deleteApparel = createAsyncThunk(
   'apparel/delete',
-  async ({ id }: { id: string }, { rejectWithValue }) => {
+  async (id: string, { rejectWithValue }) => {
     try {
       const result = await fetch(`${API_URL}apparel/${id}`, {
         method: 'DELETE',
