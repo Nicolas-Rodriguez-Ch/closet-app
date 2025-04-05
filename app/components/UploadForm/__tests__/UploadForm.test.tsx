@@ -1,11 +1,19 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import UploadForm from '../UploadForm';
-import { orchestrateApparelSubmit } from '../../../../services/orchestarteApparelSubmit';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
+import { useAppDispatch, useAppSelector } from '@/lib/hooks';
+import { uploadApparel } from '@/lib/features/apparel/apparelSlice';
 
-jest.mock('../../../../services/orchestarteApparelSubmit', () => ({
-  orchestrateApparelSubmit: jest.fn(),
+// Mock Redux hooks
+jest.mock('@/lib/hooks', () => ({
+  useAppDispatch: jest.fn(),
+  useAppSelector: jest.fn(),
+}));
+
+// Mock Redux actions
+jest.mock('@/lib/features/apparel/apparelSlice', () => ({
+  uploadApparel: jest.fn(),
 }));
 
 jest.mock('react-toastify', () => ({
@@ -24,10 +32,25 @@ global.URL.revokeObjectURL = jest.fn();
 
 describe('UploadForm', () => {
   const mockPush = jest.fn();
+  const mockDispatch = jest.fn();
+  const mockUnwrap = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
+
+    (useAppDispatch as unknown as jest.Mock).mockReturnValue(mockDispatch);
+    (useAppSelector as unknown as jest.Mock).mockImplementation((selector) => {
+      return 'idle';
+    });
+
     (useRouter as jest.Mock).mockReturnValue({ push: mockPush });
+    mockDispatch.mockReturnValue({
+      unwrap: mockUnwrap,
+    });
+    mockUnwrap.mockResolvedValue({});
+    (uploadApparel as unknown as jest.Mock).mockReturnValue({
+      type: 'apparel/upload',
+    });
   });
 
   test('renders form elements correctly', () => {
@@ -74,9 +97,6 @@ describe('UploadForm', () => {
   test('successfully submits form with valid data', async () => {
     render(<UploadForm />);
 
-    (orchestrateApparelSubmit as jest.Mock).mockResolvedValue({
-      success: true,
-    });
     (toast.promise as jest.Mock).mockImplementation((promise) => promise);
 
     const file = new File(['test image content'], 'test-image.jpg', {
@@ -96,17 +116,18 @@ describe('UploadForm', () => {
     fireEvent.click(screen.getByRole('button', { name: /Submit/i }));
 
     await waitFor(() => {
-      expect(orchestrateApparelSubmit).toHaveBeenCalledWith(
+      expect(uploadApparel).toHaveBeenCalledWith({
         file,
-        expect.objectContaining({
+        formData: expect.objectContaining({
           apparelTitle: 'Test Apparel',
           apparelDescription: 'Test Description',
           apparelType: expect.any(String),
-        })
-      );
+        }),
+      });
 
+      expect(mockDispatch).toHaveBeenCalledWith({ type: 'apparel/upload' });
+      expect(mockUnwrap).toHaveBeenCalled();
       expect(toast.promise).toHaveBeenCalled();
-
       expect(mockPush).toHaveBeenCalledWith('/');
     });
   });
@@ -115,9 +136,7 @@ describe('UploadForm', () => {
     render(<UploadForm />);
 
     const errorMessage = 'Test error message';
-    (orchestrateApparelSubmit as jest.Mock).mockRejectedValue(
-      new Error(errorMessage)
-    );
+    mockUnwrap.mockRejectedValue(errorMessage);
     (toast.promise as jest.Mock).mockImplementation((promise) => promise);
 
     const file = new File(['test content'], 'test.jpg', { type: 'image/jpeg' });
@@ -138,23 +157,8 @@ describe('UploadForm', () => {
   });
 
   test('disables form fields during submission', async () => {
+    (useAppSelector as unknown as jest.Mock).mockReturnValue('loading');
     render(<UploadForm />);
-
-    let resolvePromise: (value: unknown) => void;
-    const pendingPromise = new Promise((resolve) => {
-      resolvePromise = resolve;
-    });
-    (orchestrateApparelSubmit as jest.Mock).mockReturnValue(pendingPromise);
-    (toast.promise as jest.Mock).mockImplementation((promise) => promise);
-
-    const file = new File(['test content'], 'test.jpg', { type: 'image/jpeg' });
-    const fileInput = screen.getByLabelText(/Upload Apparel Image/i);
-    fireEvent.change(fileInput, { target: { files: [file] } });
-
-    const titleInput = screen.getByLabelText(/Apparel Item Title/i);
-    fireEvent.change(titleInput, { target: { value: 'Test Title' } });
-
-    fireEvent.click(screen.getByRole('button', { name: /Submit/i }));
 
     await waitFor(() => {
       expect(screen.getByLabelText(/Upload Apparel Image/i)).toBeDisabled();
@@ -165,16 +169,11 @@ describe('UploadForm', () => {
         screen.getByRole('button', { name: /Uploading.../i })
       ).toBeDisabled();
     });
-
-    resolvePromise!({});
   });
 
   test('clears form after successful submission', async () => {
     render(<UploadForm />);
 
-    (orchestrateApparelSubmit as jest.Mock).mockResolvedValue({
-      success: true,
-    });
     (toast.promise as jest.Mock).mockImplementation((promise) => promise);
 
     const file = new File(['test content'], 'test.jpg', { type: 'image/jpeg' });
@@ -237,12 +236,12 @@ describe('UploadForm', () => {
     fireEvent.click(screen.getByRole('button', { name: /Submit/i }));
 
     await waitFor(() => {
-      expect(orchestrateApparelSubmit).toHaveBeenCalledWith(
+      expect(uploadApparel).toHaveBeenCalledWith({
         file,
-        expect.objectContaining({
+        formData: expect.objectContaining({
           apparelType: 'BOTTOM',
-        })
-      );
+        }),
+      });
     });
   });
 
@@ -283,8 +282,6 @@ describe('UploadForm', () => {
   test('renders correct error message from toast.promise error handler', async () => {
     render(<UploadForm />);
 
-    const errorResponse = { error: 'Custom error message' };
-    (orchestrateApparelSubmit as jest.Mock).mockRejectedValue(errorResponse);
     let capturedErrorRender: any;
     (toast.promise as jest.Mock).mockImplementation((promise, options) => {
       capturedErrorRender = options.error.render;
@@ -303,7 +300,9 @@ describe('UploadForm', () => {
       expect(toast.promise).toHaveBeenCalled();
     });
 
-    const errorMessage = capturedErrorRender({ data: errorResponse });
+    const errorData = { error: 'Custom error message' };
+    const errorMessage = capturedErrorRender({ data: errorData });
+
     expect(errorMessage).toBe(
       'Error uploading apparel item: Custom error message'
     );
