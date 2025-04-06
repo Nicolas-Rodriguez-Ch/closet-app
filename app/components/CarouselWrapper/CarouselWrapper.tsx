@@ -2,7 +2,7 @@
 
 import { fetchAllApparel } from '@/lib/features/apparel/apparelSlice';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
-import React, { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import LoadingComponent from '../LoadingComponent/LoadingComponent';
 import ErrorComponent from '../ErrorComponent/ErrorComponent';
 import CarouselComponent from '../CarouselComponent/CarouselComponent';
@@ -10,24 +10,37 @@ import CarouselComponent from '../CarouselComponent/CarouselComponent';
 const CarouselWrapper = () => {
   const dispatch = useAppDispatch();
   const { items, status } = useAppSelector((state) => state.apparel);
+  const [showCoats, setShowCoats] = useState(true);
 
   useEffect(() => {
     dispatch(fetchAllApparel());
   }, [dispatch]);
 
+  const toggleCoats = () => {
+    setShowCoats((prev) => !prev);
+  };
+
   return (
-    <div>
+    <div className='bg-palette-3'>
       {(status === 'idle' || status === 'loading') && <LoadingComponent />}{' '}
       {status === 'failed' && <ErrorComponent />}
       {status === 'succeeded' && (
         <>
-          {Object.entries(items).map(([category, categoryItems]) => (
-            <CarouselComponent
-              key={category}
-              category={category}
-              item={categoryItems}
-            />
-          ))}
+          <button
+            onClick={toggleCoats}
+            className='bg-palette-1 text-white p-2 sm:p-3 rounded-full text-sm sm:text-base shadow-md hover:bg-palette-5 transition-colors duration-300 ease-in-out self-start m-2'
+          >
+            {showCoats ? 'Hide Coats' : 'Show Coats'}
+          </button>
+          {Object.entries(items)
+            .filter(([category]) => category !== 'COAT' || showCoats)
+            .map(([category, categoryItems]) => (
+              <CarouselComponent
+                key={category}
+                category={category}
+                item={categoryItems}
+              />
+            ))}
         </>
       )}
       <button>Create this outfit!</button>
