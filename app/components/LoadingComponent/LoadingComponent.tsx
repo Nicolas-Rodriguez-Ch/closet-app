@@ -18,6 +18,7 @@ const LoadingComponent = () => {
           width={100}
           height={100}
           className='animate-pulse'
+          unoptimized
         />
       </div>
     </div>

@@ -1,7 +1,13 @@
 import { DATABASE_URI } from '../public/constants/secrets';
 import mongoose from 'mongoose';
 
+let handlersRegistered = false;
+
 const connectDB = () => {
+  if (mongoose.connection.readyState >= 1) {
+    return;
+  }
+
   mongoose
     .connect(DATABASE_URI, {
       serverSelectionTimeoutMS: 5000,
@@ -14,18 +20,27 @@ const connectDB = () => {
       console.error('Failed to connect to database: ', err);
     });
 
-  mongoose.connection.on('error', (err) => {
-    console.log('Mongoose connection Error: ', err);
-  });
+  if (!handlersRegistered) {
+    mongoose.connection.on('error', (err) => {
+      console.log('Mongoose connection Error: ', err);
+    });
 
-  mongoose.connection.on('disconnected', () => {
-    console.log('Mongoose disconected from database');
-  });
+    mongoose.connection.on('disconnected', () => {
+      console.log('Mongoose disconnected from database');
+    });
 
-  process.on('SIGINT', async () => {
-    await mongoose.disconnect();
-    process.exit(0);
-  });
+    process.on('SIGINT', async () => {
+      await mongoose.disconnect();
+      process.exit(0);
+    });
+
+    handlersRegistered = true;
+  }
 };
 
+const resetHandlersRegistered = () => {
+  handlersRegistered = false;
+};
+
+export { resetHandlersRegistered };
 export default connectDB;
