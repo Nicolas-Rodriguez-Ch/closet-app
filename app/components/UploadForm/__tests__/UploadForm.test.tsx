@@ -37,9 +37,7 @@ describe('UploadForm', () => {
     jest.clearAllMocks();
 
     (useAppDispatch as unknown as jest.Mock).mockReturnValue(mockDispatch);
-    (useAppSelector as unknown as jest.Mock).mockImplementation((selector) => {
-      return 'idle';
-    });
+    (useAppSelector as unknown as jest.Mock).mockImplementation(() => 'idle');
 
     (useRouter as jest.Mock).mockReturnValue({ push: mockPush });
     mockDispatch.mockReturnValue({

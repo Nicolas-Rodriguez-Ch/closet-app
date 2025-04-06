@@ -2,12 +2,12 @@ import { makeStore } from '../store';
 
 jest.mock('../features/apparel/apparelSlice', () => ({
   __esModule: true,
-  default: (state = { mockApparelState: true }, action) => state,
+  default: (state = { mockApparelState: true }) => state,
 }));
 
 jest.mock('../features/outfit/outfitSlice', () => ({
   __esModule: true,
-  default: (state = { mockOutfitState: true }, action) => state,
+  default: (state = { mockOutfitState: true }) => state,
 }));
 
 describe('Redux Store', () => {
