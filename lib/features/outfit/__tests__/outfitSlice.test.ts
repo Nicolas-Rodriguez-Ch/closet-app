@@ -3,38 +3,38 @@ import outfitReducer, {
   clearOutfits,
   fetchAllOutfits,
   createOutfit,
-  deleteOutfit
+  deleteOutfit,
 } from '../outfitSlice';
 import { OutfitState, IOutfit, CreateOutfitPayload } from '@/lib/types';
 
 jest.mock('@/public/constants/secrets', () => ({
-  API_URL: 'http://mock-api/'
+  API_URL: 'http://mock-api/',
 }));
 
 global.fetch = jest.fn();
 
 describe('outfit slice', () => {
   let initialState: OutfitState;
-  
+
   beforeEach(() => {
     initialState = {
       items: [],
       status: 'idle',
-      error: null
+      error: null,
     };
-    
+
     jest.clearAllMocks();
   });
-  
+
   const createTestStore = (preloadedState?: OutfitState) => {
     return configureStore({
       reducer: {
-        outfit: outfitReducer
+        outfit: outfitReducer,
       },
-      preloadedState: preloadedState ? { outfit: preloadedState } : undefined
+      preloadedState: preloadedState ? { outfit: preloadedState } : undefined,
     });
   };
-  
+
   const mockOutfit: IOutfit = {
     id: 'outfit-1',
     title: 'Casual Day',
@@ -43,9 +43,9 @@ describe('outfit slice', () => {
     shoesID: 'shoes-1',
     tags: ['casual', 'spring'],
     createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    updatedAt: new Date().toISOString(),
   };
-  
+
   const mockOutfitArray: IOutfit[] = [
     mockOutfit,
     {
@@ -56,242 +56,242 @@ describe('outfit slice', () => {
       shoesID: 'shoes-2',
       tags: ['formal', 'work'],
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    }
+      updatedAt: new Date().toISOString(),
+    },
   ];
-  
+
   describe('reducer actions', () => {
     it('should handle initial state', () => {
       const nextState = outfitReducer(undefined, { type: 'unknown' });
       expect(nextState).toEqual(initialState);
     });
-    
+
     it('should handle clearOutfits', () => {
       const preloadedState: OutfitState = {
         ...initialState,
-        items: mockOutfitArray
+        items: mockOutfitArray,
       };
-      
+
       const nextState = outfitReducer(preloadedState, clearOutfits());
-      
+
       expect(nextState.items).toHaveLength(0);
     });
   });
-  
+
   describe('async thunks', () => {
     describe('fetchAllOutfits', () => {
       it('should handle successful fetch', async () => {
         const mockDispatch = jest.fn();
         const mockGetState = jest.fn();
-        
+
         (global.fetch as jest.Mock).mockResolvedValueOnce({
           ok: true,
-          json: async () => mockOutfitArray
+          json: async () => mockOutfitArray,
         });
-        
-        const result = await fetchAllOutfits()(
-          mockDispatch,
-          mockGetState,
-          {}
-        );
-        
+
+        const result = await fetchAllOutfits()(mockDispatch, mockGetState, {});
+
         expect(global.fetch).toHaveBeenCalledWith('http://mock-api/outfit');
         expect(result.payload).toEqual(mockOutfitArray);
-        
+
         const store = createTestStore();
-        
+
         store.dispatch({
           type: fetchAllOutfits.fulfilled.type,
-          payload: mockOutfitArray
+          payload: mockOutfitArray,
         });
-        
+
         const state = store.getState().outfit;
         expect(state.status).toBe('succeeded');
         expect(state.items).toEqual(mockOutfitArray);
         expect(state.error).toBeNull();
       });
-      
+
       it('should handle failed fetch with HTTP error', async () => {
         const store = createTestStore();
-        
+
         store.dispatch({
           type: fetchAllOutfits.rejected.type,
-          payload: 'HTTP error! Status: 404'
+          payload: 'HTTP error! Status: 404',
         });
-        
+
         const state = store.getState().outfit;
         expect(state.status).toBe('failed');
         expect(state.error).toBe('HTTP error! Status: 404');
       });
-      
+
       it('should handle fetch with default error message when payload is missing', async () => {
         const store = createTestStore();
-        
+
         store.dispatch({
-          type: fetchAllOutfits.rejected.type
+          type: fetchAllOutfits.rejected.type,
         });
-        
+
         const state = store.getState().outfit;
         expect(state.status).toBe('failed');
         expect(state.error).toBe('Failed to fetch outfit');
       });
-      
+
       it('should set loading state during fetch', async () => {
         const store = createTestStore();
-        
+
         store.dispatch({ type: fetchAllOutfits.pending.type });
-        
+
         const state = store.getState().outfit;
         expect(state.status).toBe('loading');
       });
     });
-    
+
     describe('createOutfit', () => {
       const mockOutfitPayload: CreateOutfitPayload = {
         title: 'New Outfit',
         topID: 'top-1',
         bottomID: 'bottom-1',
         shoesID: 'shoes-1',
-        tags: ['new', 'casual']
+        tags: ['new', 'casual'],
       };
-      
+
       it('should handle successful outfit creation', async () => {
         const mockDispatch = jest.fn();
         const mockGetState = jest.fn();
-        
+
         (global.fetch as jest.Mock).mockResolvedValueOnce({
           ok: true,
-          json: async () => mockOutfit
+          json: async () => mockOutfit,
         });
-        
+
         const result = await createOutfit(mockOutfitPayload)(
           mockDispatch,
           mockGetState,
           {}
         );
-        
+
         expect(global.fetch).toHaveBeenCalledWith(
           'http://mock-api/upload',
           expect.objectContaining({
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(mockOutfitPayload)
+            body: JSON.stringify(mockOutfitPayload),
           })
         );
-        
+
         expect(result.payload).toEqual(mockOutfit);
-        
+
         const store = createTestStore();
-        
+
         store.dispatch({
           type: createOutfit.fulfilled.type,
-          payload: mockOutfit
+          payload: mockOutfit,
         });
-        
+
         const state = store.getState().outfit;
         expect(state.status).toBe('succeeded');
         expect(state.items).toHaveLength(1);
         expect(state.items[0]).toEqual(mockOutfit);
       });
-      
+
       it('should handle createOutfit rejection', async () => {
         const store = createTestStore();
-        
+
         store.dispatch({
           type: createOutfit.rejected.type,
-          payload: 'Creation failed'
+          payload: 'Creation failed',
         });
-        
+
         const state = store.getState().outfit;
         expect(state.status).toBe('failed');
         expect(state.error).toBe('Creation failed');
       });
-      
+
       it('should handle createOutfit with default error message when payload is missing', async () => {
         const store = createTestStore();
-        
+
         store.dispatch({
-          type: createOutfit.rejected.type
+          type: createOutfit.rejected.type,
         });
-        
+
         const state = store.getState().outfit;
         expect(state.status).toBe('failed');
         expect(state.error).toBe('Failed to create outfit');
       });
     });
-    
+
     describe('deleteOutfit', () => {
       it('should handle successful outfit deletion', async () => {
         const preloadedState: OutfitState = {
           ...initialState,
-          items: [mockOutfit]
+          items: [mockOutfit],
         };
-        
+
         (global.fetch as jest.Mock).mockResolvedValueOnce({
           ok: true,
-          json: async () => ({ message: 'Successfully deleted' })
+          json: async () => ({ message: 'Successfully deleted' }),
         });
-        
+
         const store = createTestStore(preloadedState);
         await store.dispatch(deleteOutfit(mockOutfit.id));
-        
+
         expect(global.fetch).toHaveBeenCalledWith(
           `http://mock-api/outfit/${mockOutfit.id}`,
           expect.objectContaining({ method: 'DELETE' })
         );
-        
+
         const state = store.getState().outfit;
         expect(state.status).toBe('succeeded');
         expect(state.items).toHaveLength(0);
       });
-      
+
       it('should handle deleteOutfit rejection', async () => {
         (global.fetch as jest.Mock).mockResolvedValueOnce({
           ok: false,
-          status: 404
+          status: 404,
         });
-        
+
         const store = createTestStore();
         await store.dispatch(deleteOutfit('non-existent-id'));
-        
+
         const state = store.getState().outfit;
         expect(state.status).toBe('failed');
         expect(state.error).toBe('HTTP Error! Status: 404');
       });
-      
+
       it('should handle deleteOutfit with network error', async () => {
-        (global.fetch as jest.Mock).mockRejectedValueOnce(new Error('Network failure'));
-        
+        (global.fetch as jest.Mock).mockRejectedValueOnce(
+          new Error('Network failure')
+        );
+
         const store = createTestStore();
         await store.dispatch(deleteOutfit('test-id'));
-        
+
         const state = store.getState().outfit;
         expect(state.status).toBe('failed');
         expect(state.error).toBe('Network failure');
       });
     });
   });
-  
+
   describe('thunk internal error handling', () => {
-    it('should properly handle errors in fetchAllOutfits thunk', async () => {
-      const mockRejectWithValue = jest.fn((val) => `rejected:${val}`);
+    it('should handle errors in fetchAllOutfits', async () => {
+      // Create a store
+      const store = createTestStore();
       
+      // Mock fetch to fail
       (global.fetch as jest.Mock).mockRejectedValueOnce(new Error('Network error'));
       
-      const result = await fetchAllOutfits()(
-        jest.fn(),
-        jest.fn(),
-        { rejectWithValue: mockRejectWithValue }
-      );
+      // Dispatch the thunk through the store
+      await store.dispatch(fetchAllOutfits());
       
-      expect(mockRejectWithValue).toHaveBeenCalledWith('Network error');
-      
-      expect(result).toBeUndefined();
+      // Check that the final state is as expected - this is what matters
+      const state = store.getState().outfit;
+      expect(state.status).toBe('failed');
+      expect(state.error).toBe('Network error');
     });
     
-    it('should properly handle errors in createOutfit thunk', async () => {
-      const mockRejectWithValue = jest.fn((val) => `rejected:${val}`);
+    it('should handle errors in createOutfit', async () => {
+      // Create a store
+      const store = createTestStore();
       
+      // Mock fetch to return non-ok response
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: false,
         status: 400
@@ -305,15 +305,13 @@ describe('outfit slice', () => {
         tags: ['test']
       };
       
-      const result = await createOutfit(mockPayload)(
-        jest.fn(),
-        jest.fn(),
-        { rejectWithValue: mockRejectWithValue }
-      );
+      // Dispatch the thunk through the store
+      await store.dispatch(createOutfit(mockPayload));
       
-      expect(mockRejectWithValue).toHaveBeenCalledWith('HTTP error! Status: 400');
-      
-      expect(result).toBeUndefined();
+      // Check that the final state is as expected
+      const state = store.getState().outfit;
+      expect(state.status).toBe('failed');
+      expect(state.error).toBe('HTTP error! Status: 400');
     });
   });
 });
