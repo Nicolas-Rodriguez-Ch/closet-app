@@ -1,11 +1,17 @@
 @import 'tailwindcss';
 
 @theme {
+  /* Oold color palette
   --color-palette-1: #606c38;
   --color-palette-2: #283618;
   --color-palette-3: #fefae0;
   --color-palette-4: #dda15e;
-  --color-palette-5: #bc6c25;
+  --color-palette-5: #bc6c25;  */
+  --color-palette-1: #b7a89a;
+  --color-palette-2: #4f4036;
+  --color-palette-3: #efe9e1;
+  --color-palette-4: #d1bfaf;
+  --color-palette-5: #9c7e68;
   --font-feligne: 'Feligne', system-ui, sans-serif;
 }
 

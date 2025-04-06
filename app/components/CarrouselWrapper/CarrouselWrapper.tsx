@@ -3,6 +3,7 @@
 import { fetchAllApparel } from '@/lib/features/apparel/apparelSlice';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import React, { useEffect } from 'react';
+import LoadingComponent from '../LoadingComponent/LoadingComponent';
 
 const CarrouselWrapper = () => {
   const dispatch = useAppDispatch();
@@ -13,11 +14,12 @@ const CarrouselWrapper = () => {
   }, [dispatch]);
 
   console.log('🚀 ~ CarrouselWrapper ~ items:', items);
-  console.log('🚀 ~ CarrouselWrapper ~ status:', status);
 
   return (
     <div>
-      <>Carrousel wrapper</>
+      {(status === 'idle' || status === 'loading') && <LoadingComponent />}{' '}
+      {/* {status === 'failed' && <ErrorComponent />} */}
+      {status === 'succeeded' && <>{items?.BOTTOM?.[1]?.id}</>}
     </div>
   );
 };
