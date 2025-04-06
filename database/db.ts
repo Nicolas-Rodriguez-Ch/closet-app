@@ -1,17 +1,13 @@
 import { DATABASE_URI } from '../public/constants/secrets';
 import mongoose from 'mongoose';
 
-// Flag to track if event handlers have been registered
 let handlersRegistered = false;
 
 const connectDB = () => {
-  // Check if we already have a connection
   if (mongoose.connection.readyState >= 1) {
-    // If we're already connected, just return the existing connection
     return;
   }
 
-  // Only connect if no connection exists
   mongoose
     .connect(DATABASE_URI, {
       serverSelectionTimeoutMS: 5000,
