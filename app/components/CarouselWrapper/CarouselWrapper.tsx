@@ -6,7 +6,7 @@ import React, { useEffect } from 'react';
 import LoadingComponent from '../LoadingComponent/LoadingComponent';
 import ErrorComponent from '../ErrorComponent/ErrorComponent';
 
-const CarrouselWrapper = () => {
+const CarouselWrapper = () => {
   const dispatch = useAppDispatch();
   const { items, status } = useAppSelector((state) => state.apparel);
 
@@ -14,7 +14,7 @@ const CarrouselWrapper = () => {
     dispatch(fetchAllApparel());
   }, [dispatch]);
 
-  console.log('🚀 ~ CarrouselWrapper ~ items:', items);
+  console.log('🚀 ~ CarouselWrapper ~ items:', items);
 
   return (
     <div>
@@ -25,4 +25,4 @@ const CarrouselWrapper = () => {
   );
 };
 
-export default CarrouselWrapper;
+export default CarouselWrapper;

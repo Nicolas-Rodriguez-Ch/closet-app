@@ -1,9 +1,9 @@
 import { render, screen } from '@testing-library/react';
 import Home from '../page';
 
-jest.mock('../components/CarrouselWrapper/CarrouselWrapper', () => {
-  const MockComponent = () => <div data-testid="carrousel-wrapper" />;
-  MockComponent.displayName = 'CarrouselWrapper';
+jest.mock('../components/CarouselWrapper/CarouselWrapper', () => {
+  const MockComponent = () => <div data-testid="carousel-wrapper" />;
+  MockComponent.displayName = 'CarouselWrapper';
   return MockComponent;
 });
 
@@ -25,8 +25,8 @@ describe('Home Page', () => {
     expect(heading).toHaveClass('text-palette-3');
   });
 
-  it('renders CarrouselWrapper', () => {
+  it('renders CarouselWrapper', () => {
     render(<Home />);
-    expect(screen.getByTestId('carrousel-wrapper')).toBeInTheDocument();
+    expect(screen.getByTestId('carousel-wrapper')).toBeInTheDocument();
   });
 });

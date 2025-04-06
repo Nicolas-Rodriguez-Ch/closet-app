@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import CarrouselWrapper from '../CarrouselWrapper';
+import CarouselWrapper from '../CarouselWrapper';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { fetchAllApparel } from '@/lib/features/apparel/apparelSlice';
 
@@ -16,7 +16,7 @@ jest.mock('../../LoadingComponent/LoadingComponent', () => {
   return jest.fn(() => <div data-testid="loading-component">Loading</div>);
 });
 
-describe('CarrouselWrapper', () => {
+describe('CarouselWrapper', () => {
   const mockDispatch = jest.fn();
 
   beforeEach(() => {
@@ -30,7 +30,7 @@ describe('CarrouselWrapper', () => {
       status: 'idle' 
     });
 
-    render(<CarrouselWrapper />);
+    render(<CarouselWrapper />);
     expect(mockDispatch).toHaveBeenCalledWith(fetchAllApparel());
   });
 
@@ -40,7 +40,7 @@ describe('CarrouselWrapper', () => {
       status: 'idle' 
     });
 
-    render(<CarrouselWrapper />);
+    render(<CarouselWrapper />);
     expect(screen.getByTestId('loading-component')).toBeInTheDocument();
   });
 
@@ -50,7 +50,7 @@ describe('CarrouselWrapper', () => {
       status: 'loading' 
     });
 
-    render(<CarrouselWrapper />);
+    render(<CarouselWrapper />);
     expect(screen.getByTestId('loading-component')).toBeInTheDocument();
   });
 
@@ -67,7 +67,7 @@ describe('CarrouselWrapper', () => {
       status: 'succeeded' 
     });
 
-    render(<CarrouselWrapper />);
+    render(<CarouselWrapper />);
     expect(screen.getByText('test-item-id')).toBeInTheDocument();
   });
 
@@ -82,7 +82,7 @@ describe('CarrouselWrapper', () => {
       status: 'succeeded' 
     });
 
-    render(<CarrouselWrapper />);
+    render(<CarouselWrapper />);
     expect(screen.queryByTestId('loading-component')).not.toBeInTheDocument();
   });
 });
