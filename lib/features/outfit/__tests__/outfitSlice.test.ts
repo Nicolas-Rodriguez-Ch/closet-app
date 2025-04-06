@@ -272,46 +272,55 @@ describe('outfit slice', () => {
 
   describe('thunk internal error handling', () => {
     it('should handle errors in fetchAllOutfits', async () => {
-      // Create a store
       const store = createTestStore();
-      
-      // Mock fetch to fail
-      (global.fetch as jest.Mock).mockRejectedValueOnce(new Error('Network error'));
-      
-      // Dispatch the thunk through the store
+      (global.fetch as jest.Mock).mockRejectedValueOnce(
+        new Error('Network error')
+      );
       await store.dispatch(fetchAllOutfits());
-      
-      // Check that the final state is as expected - this is what matters
+
       const state = store.getState().outfit;
       expect(state.status).toBe('failed');
       expect(state.error).toBe('Network error');
     });
-    
+
     it('should handle errors in createOutfit', async () => {
-      // Create a store
       const store = createTestStore();
-      
-      // Mock fetch to return non-ok response
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: false,
-        status: 400
+        status: 400,
       });
-      
+
       const mockPayload = {
         title: 'Test',
         topID: 'top-1',
         bottomID: 'bottom-1',
         shoesID: 'shoes-1',
-        tags: ['test']
+        tags: ['test'],
       };
-      
-      // Dispatch the thunk through the store
+
       await store.dispatch(createOutfit(mockPayload));
-      
-      // Check that the final state is as expected
       const state = store.getState().outfit;
       expect(state.status).toBe('failed');
       expect(state.error).toBe('HTTP error! Status: 400');
+    });
+    it('should handle HTTP error in fetchAllOutfits response', async () => {
+      // Create a store
+      const store = createTestStore();
+      
+      // Mock fetch to return a non-ok response
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: false,
+        status: 403,
+        // We don't provide a json method because the error should be thrown before it's called
+      });
+      
+      // Dispatch the thunk through the store
+      await store.dispatch(fetchAllOutfits());
+      
+      // Check that the final state reflects the specific HTTP error we set up
+      const state = store.getState().outfit;
+      expect(state.status).toBe('failed');
+      expect(state.error).toBe('HTTP error! Status: 403');
     });
   });
 });
