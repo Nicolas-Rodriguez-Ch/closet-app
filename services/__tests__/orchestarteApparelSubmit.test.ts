@@ -1,4 +1,4 @@
-import { orchestrateApparelSubmit } from '../submitHelper';
+import { orchestrateApparelSubmit } from '../orchestarteApparelSubmit';
 import { ApparelTypeEnum } from '../types';
 
 global.fetch = jest.fn();

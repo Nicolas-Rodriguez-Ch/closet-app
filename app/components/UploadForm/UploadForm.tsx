@@ -2,12 +2,16 @@
 
 import Image from 'next/image';
 import React, { ChangeEvent, FormEvent, useState, useRef } from 'react';
-import { ApparelForm, ApparelTypeEnum } from './utils/types';
-import { orchestrateApparelSubmit } from './utils/submitHelper';
+import { ApparelForm, ApparelTypeEnum } from '../../../services/types';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
+import { useAppDispatch, useAppSelector } from '@/lib/hooks';
+import { uploadApparel } from '@/lib/features/apparel/apparelSlice';
 
 const UploadForm = () => {
+  const dispatch = useAppDispatch();
+  const uploadStatus = useAppSelector((state) => state.apparel.status);
+  const isSubmitting = uploadStatus === 'loading';
   const router = useRouter();
   const [formData, setFormData] = useState<ApparelForm>({
     apparelTitle: '',
@@ -15,7 +19,6 @@ const UploadForm = () => {
     apparelType: ApparelTypeEnum.TOP,
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [validationErrors, setValidationErrors] = useState<
     Record<string, string>
   >({});
@@ -93,19 +96,25 @@ const UploadForm = () => {
       return;
     }
 
-    setIsSubmitting(true);
-
     try {
       if (imageFile) {
-        await toast.promise(orchestrateApparelSubmit(imageFile, formData), {
-          pending: 'Uploading your Apparel Item',
-          success: 'Apparel Item uploaded successfully!',
-          error: {
-            render({ data }: any) {
-              return `Error uploading apparel item: ${data?.error}`;
+        await toast.promise(
+          dispatch(
+            uploadApparel({
+              file: imageFile,
+              formData: formData,
+            })
+          ).unwrap(),
+          {
+            pending: 'Uploading your Apparel Item',
+            success: 'Apparel Item uploaded successfully!',
+            error: {
+              render({ data }: any) {
+                return `Error uploading apparel item: ${data?.error || data}`;
+              },
             },
-          },
-        });
+          }
+        );
         setFormData({
           apparelTitle: '',
           apparelDescription: '',
@@ -116,7 +125,6 @@ const UploadForm = () => {
           URL.revokeObjectURL(currentObjectUrl.current);
           currentObjectUrl.current = null;
         }
-
         setImageFile(null);
         const fileInput = document.getElementById(
           'imageUpload'
@@ -129,8 +137,6 @@ const UploadForm = () => {
     } catch (error) {
       console.error('Form submission error:', error);
       toast.error('An unexpected error occurred. Please try again.');
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
