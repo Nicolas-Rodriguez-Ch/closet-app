@@ -32,18 +32,26 @@ const CarouselWrapper = () => {
           >
             {showCoats ? 'Hide Coats' : 'Show Coats'}
           </button>
-          {Object.entries(items)
-            .filter(([category]) => category !== 'COAT' || showCoats)
-            .map(([category, categoryItems]) => (
-              <CarouselComponent
-                key={category}
-                category={category}
-                item={categoryItems}
-              />
-            ))}
+
+          <div className='md:grid md:grid-cols-[repeat(auto-fit,minmax(300px,1fr))] md:gap-4'>
+            {Object.entries(items)
+              .filter(([category]) => category !== 'COAT' || showCoats)
+              .map(([category, categoryItems]) => (
+                <CarouselComponent
+                  key={category}
+                  category={category}
+                  item={categoryItems}
+                />
+              ))}
+          </div>
+
+          <div className='flex justify-center'>
+            <button className='bg-palette-1 text-white p-4 mb-4 rounded-4xl hover:bg-palette-5 transition-colors font-bold'>
+              Create this outfit!
+            </button>
+          </div>
         </>
       )}
-      <button>Create this outfit!</button>
     </div>
   );
 };

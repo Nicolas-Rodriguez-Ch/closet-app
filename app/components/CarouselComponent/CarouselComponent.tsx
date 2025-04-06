@@ -13,7 +13,7 @@ const CarouselComponent = ({ item, category }: CarouselComponentProps) => {
   };
 
   return (
-    <div className='w-full px-4 py-6 bg-palette-3'>
+    <div className='w-full px-4 py-4 md:py-16 bg-palette-3'>
       <section className='w-full max-w-[500px] mx-auto flex flex-col items-center space-y-4 bg-white rounded-lg shadow-md p-4'>
         <h1 className='text-lg font-bold text-palette-2 uppercase tracking-wider'>
           {category}
