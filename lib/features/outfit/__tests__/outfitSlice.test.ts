@@ -303,21 +303,17 @@ describe('outfit slice', () => {
       expect(state.status).toBe('failed');
       expect(state.error).toBe('HTTP error! Status: 400');
     });
+    
     it('should handle HTTP error in fetchAllOutfits response', async () => {
-      // Create a store
       const store = createTestStore();
       
-      // Mock fetch to return a non-ok response
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: false,
         status: 403,
-        // We don't provide a json method because the error should be thrown before it's called
       });
       
-      // Dispatch the thunk through the store
       await store.dispatch(fetchAllOutfits());
       
-      // Check that the final state reflects the specific HTTP error we set up
       const state = store.getState().outfit;
       expect(state.status).toBe('failed');
       expect(state.error).toBe('HTTP error! Status: 403');
