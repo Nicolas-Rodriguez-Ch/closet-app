@@ -6,10 +6,10 @@ import { orchestrateApparelSubmit } from '@/services/orchestarteApparelSubmit';
 
 const initialState: ApparelState = {
   items: {
+    COAT: [],
     TOP: [],
     BOTTOM: [],
     SHOES: [],
-    COAT: [],
   },
   status: 'idle',
   error: null,
@@ -98,10 +98,10 @@ const apparelSlice = createSlice({
   reducers: {
     clearApparel: (state) => {
       state.items = {
+        COAT: [],
         TOP: [],
         BOTTOM: [],
         SHOES: [],
-        COAT: [],
       };
     },
     addApparel: (state, action: PayloadAction<IApparel>) => {
@@ -120,10 +120,10 @@ const apparelSlice = createSlice({
           state.status = 'succeeded';
 
           state.items = {
+            COAT: [],
             TOP: [],
             BOTTOM: [],
             SHOES: [],
-            COAT: [],
           };
 
           action.payload.forEach((apparel) => {

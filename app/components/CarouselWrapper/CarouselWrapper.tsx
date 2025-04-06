@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import React, { useEffect } from 'react';
 import LoadingComponent from '../LoadingComponent/LoadingComponent';
 import ErrorComponent from '../ErrorComponent/ErrorComponent';
+import CarouselComponent from '../CarouselComponent/CarouselComponent';
 
 const CarouselWrapper = () => {
   const dispatch = useAppDispatch();
@@ -14,13 +15,22 @@ const CarouselWrapper = () => {
     dispatch(fetchAllApparel());
   }, [dispatch]);
 
-  console.log('🚀 ~ CarouselWrapper ~ items:', items);
-
   return (
     <div>
       {(status === 'idle' || status === 'loading') && <LoadingComponent />}{' '}
       {status === 'failed' && <ErrorComponent />}
-      {status === 'succeeded' && <>{items?.BOTTOM?.[1]?.id}</>}
+      {status === 'succeeded' && (
+        <>
+          {Object.entries(items).map(([category, categoryItems]) => (
+            <CarouselComponent
+              key={category}
+              category={category}
+              item={categoryItems}
+            />
+          ))}
+        </>
+      )}
+      <button>Create this outfit!</button>
     </div>
   );
 };
