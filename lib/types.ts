@@ -59,3 +59,7 @@ export interface CarouselComponentProps {
   category: string;
   item: IApparel[];
 }
+export interface ApparelSlideProps {
+  imgSrc: string,
+  title: string
+}
