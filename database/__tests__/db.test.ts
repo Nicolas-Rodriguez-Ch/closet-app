@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import connectDB from '../db';
+import connectDB, { resetHandlersRegistered } from '../db';
 import { DATABASE_URI } from '@/public/constants/secrets';
 
 jest.mock('mongoose', () => {
@@ -16,11 +16,15 @@ jest.mock('mongoose', () => {
       return Promise.resolve();
     }),
     connection: {
+      readyState: 0,
       on: onMock,
       _triggerEvent: (event, ...args) => {
         if (connectionHandlers[event]) {
           connectionHandlers[event](...args);
         }
+      },
+      _setReadyState: (state) => {
+        mongoose.connection.readyState = state;
       },
     },
     disconnect: jest.fn().mockResolvedValue(undefined),
@@ -46,9 +50,11 @@ describe('Database Connection', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mongoose.connection._setReadyState(0);
+    resetHandlersRegistered();
   });
 
-  it('connects to the database with the correct URI and options', async () => {
+  it('connects to the database with the correct URI and options when no connection exists', async () => {
     connectDB();
     expect(mongoose.connect).toHaveBeenCalledWith(
       DATABASE_URI,
@@ -57,6 +63,22 @@ describe('Database Connection', () => {
         socketTimeoutMS: 45000,
       })
     );
+  });
+
+  it('does not attempt to connect when a connection already exists', async () => {
+    mongoose.connection._setReadyState(1);
+
+    connectDB();
+
+    expect(mongoose.connect).not.toHaveBeenCalled();
+  });
+
+  it('does not attempt to connect when a connection is being established', async () => {
+    mongoose.connection._setReadyState(2);
+
+    connectDB();
+
+    expect(mongoose.connect).not.toHaveBeenCalled();
   });
 
   it('sets up error handler for mongoose connection', () => {
@@ -89,7 +111,7 @@ describe('Database Connection', () => {
     connectDB();
     mongoose.connection._triggerEvent('disconnected');
     expect(console.log).toHaveBeenCalledWith(
-      'Mongoose disconected from database'
+      'Mongoose disconnected from database'
     );
   });
 
@@ -132,5 +154,14 @@ describe('Database Connection', () => {
     } else {
       throw new Error('SIGINT handler was not registered');
     }
+  });
+
+  it('only registers event handlers once even when called multiple times', () => {
+    connectDB();
+    connectDB();
+    connectDB();
+
+    expect(mongoose.connection.on).toHaveBeenCalledTimes(2);
+    expect(mockProcessOn).toHaveBeenCalledTimes(1);
   });
 });
