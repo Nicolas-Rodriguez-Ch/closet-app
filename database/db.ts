@@ -20,7 +20,6 @@ const connectDB = () => {
       console.error('Failed to connect to database: ', err);
     });
 
-  // Only register event handlers once
   if (!handlersRegistered) {
     mongoose.connection.on('error', (err) => {
       console.log('Mongoose connection Error: ', err);
@@ -35,12 +34,10 @@ const connectDB = () => {
       process.exit(0);
     });
 
-    // Set flag to indicate handlers have been registered
     handlersRegistered = true;
   }
 };
 
-// For testing purposes only - allows resetting the handler registration flag
 const resetHandlersRegistered = () => {
   handlersRegistered = false;
 };
