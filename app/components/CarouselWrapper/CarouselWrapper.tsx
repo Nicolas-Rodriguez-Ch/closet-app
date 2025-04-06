@@ -28,7 +28,7 @@ const CarouselWrapper = () => {
         <>
           <button
             onClick={toggleCoats}
-            className='bg-palette-1 text-white p-2 sm:p-3 rounded-full text-sm sm:text-base shadow-md hover:bg-palette-5 transition-colors duration-300 ease-in-out self-start m-2'
+            className='bg-palette-1 text-white p-2 rounded-full text-sm shadow-md hover:bg-palette-5 transition-colors duration-300 ease-in-out self-start m-2 md:absolute md:top-[initial] md:left-[initial] sm:p-3 sm:text-base'
           >
             {showCoats ? 'Hide Coats' : 'Show Coats'}
           </button>
