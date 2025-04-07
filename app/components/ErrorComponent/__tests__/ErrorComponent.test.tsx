@@ -1,7 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import ErrorComponent from '../ErrorComponent';
 
-// Mock Next.js Image and Link components
 jest.mock('next/image', () => ({
   __esModule: true,
   default: (props: any) => {
