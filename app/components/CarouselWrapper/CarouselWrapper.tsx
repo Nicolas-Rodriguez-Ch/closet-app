@@ -8,9 +8,11 @@ import CarouselComponent from '../CarouselComponent/CarouselComponent';
 import { CreateOutfitPayload } from '@/lib/types';
 import { createOutfit } from '@/lib/features/outfit/outfitSlice';
 import { toast } from 'react-toastify';
+import { useRouter } from 'next/router';
 
 const CarouselWrapper = () => {
   const dispatch = useAppDispatch();
+  const router = useRouter();
   const { items, status } = useAppSelector((state) => state.apparel);
   const [showCoats, setShowCoats] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -143,7 +145,8 @@ const CarouselWrapper = () => {
             outfitTags: '',
             outfitDescription: '',
           });
-          setShowModal(false);
+          setShowModal(false)
+          router.push('/outfits');
         }),
       {
         pending: 'Creating your outfit',
