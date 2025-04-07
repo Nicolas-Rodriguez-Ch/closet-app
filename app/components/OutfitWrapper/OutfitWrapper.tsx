@@ -22,6 +22,7 @@ const OutfitWrapper = () => {
       {status === 'succeeded' && (
         <div className='container mx-auto px-3 sm:px-6'>
           <div
+            data-testid='outfits-grid'
             className={`grid grid-cols-1 sm:grid-cols-2 ${
               items.length <= 3 ? 'lg:grid-cols-3' : 'lg:grid-cols-4'
             } gap-3 sm:gap-5`}
