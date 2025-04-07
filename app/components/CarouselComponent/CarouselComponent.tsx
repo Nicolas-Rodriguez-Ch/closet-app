@@ -1,9 +1,20 @@
 import { CarouselComponentProps } from '@/lib/types';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ApparelSlide from './ApparrelSlide/ApparelSlide';
 
-const CarouselComponent = ({ item, category }: CarouselComponentProps) => {
+const CarouselComponent = ({
+  item,
+  category,
+  onIndexChange,
+}: CarouselComponentProps) => {
   const [activeIndex, setActiveIndex] = useState(0);
+
+  useEffect(() => {
+    if (onIndexChange) {
+      onIndexChange(activeIndex, category);
+    }
+  }, [activeIndex, onIndexChange, category]);
+
   const showNextItem = () => {
     setActiveIndex((prev) => (prev + 1) % item.length);
   };

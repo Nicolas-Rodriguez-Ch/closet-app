@@ -58,8 +58,10 @@ export interface OutfitState {
 export interface CarouselComponentProps {
   category: string;
   item: IApparel[];
+  // In types.ts
+  onIndexChange?: (index: number, category?: string) => void;
 }
 export interface ApparelSlideProps {
-  imgSrc: string,
-  title: string
+  imgSrc: string;
+  title: string;
 }

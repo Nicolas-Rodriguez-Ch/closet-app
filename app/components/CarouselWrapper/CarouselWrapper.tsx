@@ -2,7 +2,7 @@
 
 import { fetchAllApparel } from '@/lib/features/apparel/apparelSlice';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import LoadingComponent from '../LoadingComponent/LoadingComponent';
 import ErrorComponent from '../ErrorComponent/ErrorComponent';
 import CarouselComponent from '../CarouselComponent/CarouselComponent';
@@ -12,12 +12,40 @@ const CarouselWrapper = () => {
   const { items, status } = useAppSelector((state) => state.apparel);
   const [showCoats, setShowCoats] = useState(true);
 
+  const activeIndicesRef = useRef<Record<string, number>>({});
+
   useEffect(() => {
     dispatch(fetchAllApparel());
   }, [dispatch]);
 
+  useEffect(() => {
+    if (!showCoats && 'COAT' in activeIndicesRef.current) {
+      const newIndices = { ...activeIndicesRef.current };
+      delete newIndices['COAT'];
+      activeIndicesRef.current = newIndices;
+    }
+  }, [showCoats]);
+
   const toggleCoats = () => {
     setShowCoats((prev) => !prev);
+  };
+
+  const handleIndexChange = (category: string, index: number) => {
+    activeIndicesRef.current[category] = index;
+  };
+
+  const handleCreateOutfit = () => {
+    const renderedCategories = Object.entries(items)
+      .filter(([category]) => category !== 'COAT' || showCoats)
+      .map(([category]) => category);
+
+    const currentOutfit = Object.fromEntries(
+      Object.entries(activeIndicesRef.current).filter(([category]) =>
+        renderedCategories.includes(category)
+      )
+    );
+
+    console.log('Outfit selection: ', currentOutfit);
   };
 
   return (
@@ -41,12 +69,18 @@ const CarouselWrapper = () => {
                   key={category}
                   category={category}
                   item={categoryItems}
+                  onIndexChange={(index) => {
+                    handleIndexChange(category, index);
+                  }}
                 />
               ))}
           </div>
 
           <div className='flex justify-center'>
-            <button className='bg-palette-1 text-white p-4 mb-4 rounded-4xl hover:bg-palette-5 transition-colors font-bold'>
+            <button
+              onClick={handleCreateOutfit}
+              className='bg-palette-1 text-white p-4 mb-4 rounded-4xl hover:bg-palette-5 transition-colors font-bold'
+            >
               Create this outfit!
             </button>
           </div>
