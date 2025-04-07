@@ -130,48 +130,84 @@ const CarouselWrapper = () => {
             </button>
           </div>
           {showModal ? (
-            <>
-              <form onSubmit={handleCreateOutfit}>
-                <label htmlFor='outfitTitle'>Add a title for this Outfit</label>
-                <input
-                  type='text'
-                  required
-                  name='outfitTitle'
-                  id='outfitTitle'
-                  value={oufitAdditionalInfo.outfitTitle}
-                  placeholder='Comfortable outerware'
-                  onChange={handleChange}
-                />
-                <label htmlFor='outfitTags'>
-                  Tags for this outfit, separate them with coma
-                </label>
-                <input
-                  type='text'
-                  required
-                  name='outfitTags'
-                  id='outfitTags'
-                  value={oufitAdditionalInfo.outfitTags}
-                  placeholder='outdors, comfortable, casual'
-                  onChange={handleChange}
-                />
-                <label htmlFor='outfitDescription'>
-                  Add a title for this Outfit
-                </label>
-                <input
-                  type='text'
-                  name='outfitDescription'
-                  id='outfitDescription'
-                  value={oufitAdditionalInfo.outfitDescription}
-                  placeholder='This is a comfortable outfit for sunny days.'
-                  onChange={handleChange}
-                />
-                <button onClick={closeModal}>Close</button>
-                <button type='submit'>Create outfit</button>
-              </form>
-            </>
-          ) : (
-            <></>
-          )}
+            <div className='fixed inset-0 z-50 flex items-center justify-center bg-palette-2/50'>
+              <div className='w-11/12 max-w-md p-6 rounded-2xl bg-palette-3 backdrop-blur-lg border border-white/30 shadow-2xl'>
+                <form onSubmit={handleCreateOutfit} className='space-y-4'>
+                  <div className='bg-white p-4 rounded-2xl'>
+                    <label
+                      htmlFor='outfitTitle'
+                      className='block text-palette-2 font-semibold mb-2'
+                    >
+                      Add a title for this Outfit
+                    </label>
+                    <input
+                      type='text'
+                      required
+                      name='outfitTitle'
+                      id='outfitTitle'
+                      value={oufitAdditionalInfo.outfitTitle}
+                      placeholder='Comfortable outerwear'
+                      onChange={handleChange}
+                      className='w-full p-2 rounded-md bg-white/50 border border-palette-4/50 focus:outline-none focus:ring-2 focus:ring-palette-5 text-palette-2 placeholder-palette-2/50'
+                    />
+                  </div>
+
+                  <div className='bg-white p-4 rounded-2xl'>
+                    <label
+                      htmlFor='outfitTags'
+                      className='block text-palette-2 font-semibold mb-2'
+                    >
+                      Tags for this outfit, separate them with comma
+                    </label>
+                    <input
+                      type='text'
+                      required
+                      name='outfitTags'
+                      id='outfitTags'
+                      value={oufitAdditionalInfo.outfitTags}
+                      placeholder='outdoors, comfortable, casual'
+                      onChange={handleChange}
+                      className='w-full p-2 rounded-md bg-white/50 border border-palette-4/50 focus:outline-none focus:ring-2 focus:ring-palette-5 text-palette-2 placeholder-palette-2/50'
+                    />
+                  </div>
+
+                  <div className='bg-white p-4 rounded-2xl'>
+                    <label
+                      htmlFor='outfitDescription'
+                      className='block text-palette-2 font-semibold mb-2'
+                    >
+                      Add a description for this Outfit
+                    </label>
+                    <input
+                      type='text'
+                      name='outfitDescription'
+                      id='outfitDescription'
+                      value={oufitAdditionalInfo.outfitDescription}
+                      placeholder='This is a comfortable outfit for sunny days.'
+                      onChange={handleChange}
+                      className='w-full p-2 rounded-md bg-white/50 border border-palette-4/50 focus:outline-none focus:ring-2 focus:ring-palette-5 text-palette-2 placeholder-palette-2/50'
+                    />
+                  </div>
+
+                  <div className='flex justify-between mt-6'>
+                    <button
+                      type='button'
+                      onClick={closeModal}
+                      className='px-4 py-2 rounded-full bg-palette-4/50 text-palette-2 hover:bg-palette-4 transition-colors'
+                    >
+                      Close
+                    </button>
+                    <button
+                      type='submit'
+                      className='px-4 py-2 rounded-full bg-palette-1 text-white hover:bg-palette-5 transition-colors'
+                    >
+                      Create outfit
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          ) : null}
         </>
       )}
     </div>
