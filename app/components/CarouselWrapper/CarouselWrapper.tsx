@@ -1,5 +1,4 @@
 'use client';
-
 import { fetchAllApparel } from '@/lib/features/apparel/apparelSlice';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react';
@@ -15,6 +14,10 @@ const CarouselWrapper = () => {
   const { items, status } = useAppSelector((state) => state.apparel);
   const [showCoats, setShowCoats] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [formErrors, setFormErrors] = useState<{
+    outfitTitle?: string;
+    outfitTags?: string;
+  }>({});
   const [oufitAdditionalInfo, setOutfitAdditionalInfo] = useState<{
     outfitTitle: string;
     outfitTags: string;
@@ -53,7 +56,15 @@ const CarouselWrapper = () => {
       ...prev,
       [name]: value,
     }));
+
+    if (formErrors[name as keyof typeof formErrors]) {
+      setFormErrors((prev) => ({
+        ...prev,
+        [name]: undefined,
+      }));
+    }
   };
+
   const closeModal = () => {
     setShowModal(false);
     setOutfitAdditionalInfo({
@@ -61,6 +72,7 @@ const CarouselWrapper = () => {
       outfitTags: '',
       outfitDescription: '',
     });
+    setFormErrors({});
   };
 
   const createOutfitBtn = () => {
@@ -69,6 +81,40 @@ const CarouselWrapper = () => {
 
   const handleCreateOutfit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    const errors: {
+      outfitTitle?: string;
+      outfitTags?: string;
+    } = {};
+
+    if (!oufitAdditionalInfo.outfitTitle.trim()) {
+      errors.outfitTitle = 'Outfit title is required';
+    } else if (oufitAdditionalInfo.outfitTitle.length < 3) {
+      errors.outfitTitle = 'Title must be at least 3 characters long';
+    } else if (oufitAdditionalInfo.outfitTitle.length > 50) {
+      errors.outfitTitle = 'Title cannot exceed 50 characters';
+    }
+    const tags = oufitAdditionalInfo.outfitTags
+      .split(',')
+      .map((tag) => tag.trim())
+      .filter(Boolean);
+      
+    if (!tags) {
+      errors.outfitTags = 'At least one tag is required';
+    } else {
+      if (tags.length === 0) {
+        errors.outfitTags = 'Please provide valid tags';
+      } else if (tags.some((tag) => tag.length < 2)) {
+        errors.outfitTags = 'Each tag must be at least 2 characters long';
+      } else if (tags.length > 5) {
+        errors.outfitTags = 'Maximum 5 tags allowed';
+      }
+    }
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      return;
+    }
+
     const renderedCategories = Object.entries(items)
       .filter(([category]) => category !== 'COAT' || showCoats)
       .map(([category]) => category);
@@ -78,9 +124,6 @@ const CarouselWrapper = () => {
         renderedCategories.includes(category)
       )
     );
-    const tags = oufitAdditionalInfo.outfitTags
-      .split(',')
-      .map((tag) => tag.trim());
 
     const body: CreateOutfitPayload = {
       ...(currentOutfit.COAT !== undefined && {
@@ -130,7 +173,6 @@ const CarouselWrapper = () => {
           >
             {showCoats ? 'Hide Coats' : 'Show Coats'}
           </button>
-
           <div className='md:grid md:grid-cols-[repeat(auto-fit,minmax(300px,1fr))] md:gap-4'>
             {Object.entries(items)
               .filter(([category]) => category !== 'COAT' || showCoats)
@@ -145,7 +187,6 @@ const CarouselWrapper = () => {
                 />
               ))}
           </div>
-
           <div className='flex justify-center'>
             <button
               onClick={createOutfitBtn}
@@ -176,8 +217,12 @@ const CarouselWrapper = () => {
                       onChange={handleChange}
                       className='w-full p-2 rounded-md bg-white/50 border border-palette-4/50 focus:outline-none focus:ring-2 focus:ring-palette-5/50 text-palette-2 placeholder-palette-2/50 transition-all duration-200'
                     />
+                    {formErrors.outfitTitle && (
+                      <p className='text-red-500 text-sm mt-1'>
+                        {formErrors.outfitTitle}
+                      </p>
+                    )}
                   </div>
-
                   <div className='bg-white p-4 rounded-xl shadow-sm'>
                     <label
                       htmlFor='outfitTags'
@@ -196,8 +241,12 @@ const CarouselWrapper = () => {
                       onChange={handleChange}
                       className='w-full p-2 rounded-md bg-white/50 border border-palette-4/50 focus:outline-none focus:ring-2 focus:ring-palette-5/50 text-palette-2 placeholder-palette-2/50 transition-all duration-200'
                     />
+                    {formErrors.outfitTags && (
+                      <p className='text-red-500 text-sm mt-1'>
+                        {formErrors.outfitTags}
+                      </p>
+                    )}
                   </div>
-
                   <div className='bg-white p-4 rounded-xl shadow-sm'>
                     <label
                       htmlFor='outfitDescription'
@@ -215,7 +264,6 @@ const CarouselWrapper = () => {
                       className='w-full p-2 rounded-md bg-white/50 border border-palette-4/50 focus:outline-none focus:ring-2 focus:ring-palette-5/50 text-palette-2 placeholder-palette-2/50 transition-all duration-200'
                     />
                   </div>
-
                   <div className='flex justify-between mt-6'>
                     <button
                       type='button'
