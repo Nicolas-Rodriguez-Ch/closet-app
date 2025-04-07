@@ -167,7 +167,7 @@ describe('outfit slice', () => {
         );
 
         expect(global.fetch).toHaveBeenCalledWith(
-          'http://mock-api/upload',
+          'http://mock-api/outfit',
           expect.objectContaining({
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

@@ -54,3 +54,13 @@ export interface OutfitState {
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
 }
+
+export interface CarouselComponentProps {
+  category: string;
+  item: IApparel[];
+  onIndexChange?: (index: number, category?: string) => void;
+}
+export interface ApparelSlideProps {
+  imgSrc: string;
+  title: string;
+}

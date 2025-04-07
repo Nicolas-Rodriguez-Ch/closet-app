@@ -27,7 +27,7 @@ export const createOutfit = createAsyncThunk(
   'outfit/create',
   async (outfitData: CreateOutfitPayload, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_URL}upload`, {
+      const response = await fetch(`${API_URL}outfit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(outfitData),
