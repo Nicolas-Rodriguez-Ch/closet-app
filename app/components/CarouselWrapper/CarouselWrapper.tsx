@@ -8,7 +8,7 @@ import CarouselComponent from '../CarouselComponent/CarouselComponent';
 import { CreateOutfitPayload } from '@/lib/types';
 import { createOutfit } from '@/lib/features/outfit/outfitSlice';
 import { toast } from 'react-toastify';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 const CarouselWrapper = () => {
   const dispatch = useAppDispatch();
