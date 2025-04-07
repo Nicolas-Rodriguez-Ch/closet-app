@@ -25,17 +25,13 @@ export interface IOutfit {
   title: string;
   description?: string;
   pictureURL?: string;
-  topID: string;
-  bottomID: string;
-  shoesID: string;
-  coatID?: string;
+  topID: IApparel;
+  bottomID: IApparel;
+  shoesID: IApparel;
+  coatID?: IApparel;
   tags: string[];
   createdAt: string;
   updatedAt: string;
-  top?: IApparel;
-  bottom?: IApparel;
-  shoes?: IApparel;
-  coat?: IApparel;
 }
 
 export interface CreateOutfitPayload {
@@ -63,4 +59,8 @@ export interface CarouselComponentProps {
 export interface ApparelSlideProps {
   imgSrc: string;
   title: string;
+}
+
+export interface OutfitItemProps {
+  item: IOutfit;
 }
