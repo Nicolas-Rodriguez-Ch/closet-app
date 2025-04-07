@@ -17,7 +17,7 @@ const OutfitItem = ({ item }: OutfitItemProps) => {
         ) : null}
       </div>
 
-      <Link href={`/outfit/${item.id}`} className='block p-3 sm:p-4'>
+      <Link href={`/outfits/${item.id}`} className='block p-3 sm:p-4'>
         <div className='grid grid-cols-2 gap-3 sm:gap-4'>
           {item.coatID && (
             <div className='flex flex-col items-center'>
