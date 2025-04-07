@@ -8,6 +8,7 @@ import ErrorComponent from '../ErrorComponent/ErrorComponent';
 import CarouselComponent from '../CarouselComponent/CarouselComponent';
 import { CreateOutfitPayload } from '@/lib/types';
 import { createOutfit } from '@/lib/features/outfit/outfitSlice';
+import { toast } from 'react-toastify';
 
 const CarouselWrapper = () => {
   const dispatch = useAppDispatch();
@@ -55,11 +56,17 @@ const CarouselWrapper = () => {
   };
   const closeModal = () => {
     setShowModal(false);
+    setOutfitAdditionalInfo({
+      outfitTitle: '',
+      outfitTags: '',
+      outfitDescription: '',
+    });
   };
 
   const createOutfitBtn = () => {
     setShowModal(true);
   };
+
   const handleCreateOutfit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const renderedCategories = Object.entries(items)
@@ -88,9 +95,27 @@ const CarouselWrapper = () => {
     };
     if (!body.description) delete body.description;
 
-    // dispatch(createOutfit(body));
-
-    console.log('Outfit selection: ', body);
+    toast.promise(
+      dispatch(createOutfit(body))
+        .unwrap()
+        .then(() => {
+          setOutfitAdditionalInfo({
+            outfitTitle: '',
+            outfitTags: '',
+            outfitDescription: '',
+          });
+          setShowModal(false);
+        }),
+      {
+        pending: 'Creating your outfit',
+        success: 'Outfit created successfully!',
+        error: {
+          render({ data }: any) {
+            return `Error creating outfit: ${data?.error || data}`;
+          },
+        },
+      }
+    );
   };
 
   return (
@@ -131,14 +156,15 @@ const CarouselWrapper = () => {
           </div>
           {showModal ? (
             <div className='fixed inset-0 z-50 flex items-center justify-center bg-palette-2/50'>
-              <div className='w-11/12 max-w-md p-6 rounded-2xl bg-palette-3 backdrop-blur-lg border border-white/30 shadow-2xl'>
-                <form onSubmit={handleCreateOutfit} className='space-y-4'>
-                  <div className='bg-white p-4 rounded-2xl'>
+              <div className='w-11/12 max-w-md p-6 rounded-xl bg-palette-3 backdrop-blur-lg border border-white/30 shadow-2xl relative'>
+                <form onSubmit={handleCreateOutfit} className='space-y-5'>
+                  <div className='bg-white p-4 rounded-xl shadow-sm'>
                     <label
                       htmlFor='outfitTitle'
                       className='block text-palette-2 font-semibold mb-2'
                     >
                       Add a title for this Outfit
+                      <span className='text-palette-5'>*</span>
                     </label>
                     <input
                       type='text'
@@ -148,16 +174,17 @@ const CarouselWrapper = () => {
                       value={oufitAdditionalInfo.outfitTitle}
                       placeholder='Comfortable outerwear'
                       onChange={handleChange}
-                      className='w-full p-2 rounded-md bg-white/50 border border-palette-4/50 focus:outline-none focus:ring-2 focus:ring-palette-5 text-palette-2 placeholder-palette-2/50'
+                      className='w-full p-2 rounded-md bg-white/50 border border-palette-4/50 focus:outline-none focus:ring-2 focus:ring-palette-5/50 text-palette-2 placeholder-palette-2/50 transition-all duration-200'
                     />
                   </div>
 
-                  <div className='bg-white p-4 rounded-2xl'>
+                  <div className='bg-white p-4 rounded-xl shadow-sm'>
                     <label
                       htmlFor='outfitTags'
                       className='block text-palette-2 font-semibold mb-2'
                     >
                       Tags for this outfit, separate them with comma
+                      <span className='text-palette-5'>*</span>
                     </label>
                     <input
                       type='text'
@@ -167,11 +194,11 @@ const CarouselWrapper = () => {
                       value={oufitAdditionalInfo.outfitTags}
                       placeholder='outdoors, comfortable, casual'
                       onChange={handleChange}
-                      className='w-full p-2 rounded-md bg-white/50 border border-palette-4/50 focus:outline-none focus:ring-2 focus:ring-palette-5 text-palette-2 placeholder-palette-2/50'
+                      className='w-full p-2 rounded-md bg-white/50 border border-palette-4/50 focus:outline-none focus:ring-2 focus:ring-palette-5/50 text-palette-2 placeholder-palette-2/50 transition-all duration-200'
                     />
                   </div>
 
-                  <div className='bg-white p-4 rounded-2xl'>
+                  <div className='bg-white p-4 rounded-xl shadow-sm'>
                     <label
                       htmlFor='outfitDescription'
                       className='block text-palette-2 font-semibold mb-2'
@@ -185,7 +212,7 @@ const CarouselWrapper = () => {
                       value={oufitAdditionalInfo.outfitDescription}
                       placeholder='This is a comfortable outfit for sunny days.'
                       onChange={handleChange}
-                      className='w-full p-2 rounded-md bg-white/50 border border-palette-4/50 focus:outline-none focus:ring-2 focus:ring-palette-5 text-palette-2 placeholder-palette-2/50'
+                      className='w-full p-2 rounded-md bg-white/50 border border-palette-4/50 focus:outline-none focus:ring-2 focus:ring-palette-5/50 text-palette-2 placeholder-palette-2/50 transition-all duration-200'
                     />
                   </div>
 
