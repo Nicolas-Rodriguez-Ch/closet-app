@@ -41,15 +41,6 @@ jest.mock('../../CarouselComponent/CarouselComponent', () => {
   ));
 });
 
-jest.mock('../CarouselWrapper', () => {
-  const originalModule = jest.requireActual('../CarouselWrapper');
-  
-  return {
-    __esModule: true,
-    default: originalModule.default
-  };
-});
-
 describe('CarouselWrapper', () => {
   const mockDispatch = jest.fn();
   const mockUnwrap = jest.fn();
@@ -68,7 +59,7 @@ describe('CarouselWrapper', () => {
       unwrap: mockUnwrap
     });
     mockUnwrap.mockResolvedValue({});
-    (toast.promise as jest.Mock).mockImplementation((promise, options) => {
+    (toast.promise as jest.Mock).mockImplementation((promise) => {
       return promise;
     });
   });
@@ -170,9 +161,20 @@ describe('CarouselWrapper', () => {
     expect(screen.queryByText('Add a title for this Outfit')).not.toBeInTheDocument();
   });
 
-  it.skip('shows validation errors for empty form fields', () => {});
-  it.skip('validates title length', () => {});
-  it.skip('validates tags input', () => {});
+  it('validates form and prevents API call when fields are invalid', () => {
+    (useAppSelector as unknown as jest.Mock).mockReturnValue({ 
+      items: mockApparelItems, 
+      status: 'succeeded' 
+    });
+
+    render(<CarouselWrapper />);
+    fireEvent.click(screen.getByText('Create this outfit!'));
+    
+    fireEvent.click(screen.getByText('Create outfit'));
+    
+    expect(createOutfit).not.toHaveBeenCalled();
+    expect(mockDispatch).not.toHaveBeenCalledWith({ type: 'CREATE_OUTFIT' });
+  });
 
   it('creates outfit successfully with valid data', async () => {
     (useAppSelector as unknown as jest.Mock).mockReturnValue({ 
@@ -330,6 +332,50 @@ describe('CarouselWrapper', () => {
       expect(createOutfit).not.toHaveBeenCalledWith(
         expect.objectContaining({ description: expect.anything() })
       );
+    });
+  });
+  
+  it('validates input field based on logic, not just required attribute', async () => {
+    (useAppSelector as unknown as jest.Mock).mockReturnValue({ 
+      items: mockApparelItems, 
+      status: 'succeeded' 
+    });
+
+    render(<CarouselWrapper />);
+    fireEvent.click(screen.getByText('Create this outfit!'));
+    
+    const titleInput = screen.getByLabelText(/Add a title for this Outfit/);
+    const tagsInput = screen.getByLabelText(/Tags for this outfit/);
+    
+    fireEvent.change(titleInput, { target: { value: 'ab' } });
+    fireEvent.change(tagsInput, { target: { value: 'valid-tag' } });
+    fireEvent.click(screen.getByText('Create outfit'));
+    expect(createOutfit).not.toHaveBeenCalled();
+    
+    fireEvent.change(titleInput, { target: { value: 'a'.repeat(51) } });
+    fireEvent.click(screen.getByText('Create outfit'));
+    expect(createOutfit).not.toHaveBeenCalled();
+    
+    fireEvent.change(titleInput, { target: { value: 'Valid Title' } });
+    fireEvent.change(tagsInput, { target: { value: 'a' } });
+    fireEvent.click(screen.getByText('Create outfit'));
+    expect(createOutfit).not.toHaveBeenCalled();
+    
+    fireEvent.change(tagsInput, { target: { value: 'tag1, tag2, tag3, tag4, tag5, tag6' } });
+    fireEvent.click(screen.getByText('Create outfit'));
+    expect(createOutfit).not.toHaveBeenCalled();
+    
+    fireEvent.change(titleInput, { target: { value: 'Valid Title' } });
+    fireEvent.change(tagsInput, { target: { value: 'tag1, tag2' } });
+    
+    fireEvent.click(screen.getByTestId('carousel-TOP').querySelector('button')!);
+    fireEvent.click(screen.getByTestId('carousel-BOTTOM').querySelector('button')!);
+    fireEvent.click(screen.getByTestId('carousel-SHOES').querySelector('button')!);
+    
+    fireEvent.click(screen.getByText('Create outfit'));
+    
+    await waitFor(() => {
+      expect(createOutfit).toHaveBeenCalled();
     });
   });
 
