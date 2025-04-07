@@ -379,14 +379,11 @@ describe('CarouselWrapper', () => {
     });
   });
   
-  it('validates empty title field and triggers error', () => {
+  it('validates title required (specifically tests this condition)', () => {
     (useAppSelector as unknown as jest.Mock).mockReturnValue({ 
       items: mockApparelItems, 
       status: 'succeeded' 
     });
-
-    const originalError = console.error;
-    console.error = jest.fn();
 
     render(<CarouselWrapper />);
     fireEvent.click(screen.getByText('Create this outfit!'));
@@ -400,33 +397,25 @@ describe('CarouselWrapper', () => {
     fireEvent.click(screen.getByText('Create outfit'));
     
     expect(createOutfit).not.toHaveBeenCalled();
-
-    console.error = originalError;
   });
   
-  it('validates empty tags list and triggers error', () => {
+  it('validates empty tags array (specifically tests tags.length === 0)', () => {
     (useAppSelector as unknown as jest.Mock).mockReturnValue({ 
       items: mockApparelItems, 
       status: 'succeeded' 
     });
-
-    const originalError = console.error;
-    console.error = jest.fn();
 
     render(<CarouselWrapper />);
     fireEvent.click(screen.getByText('Create this outfit!'));
     
     const titleInput = screen.getByLabelText(/Add a title for this Outfit/);
     fireEvent.change(titleInput, { target: { value: 'Valid Title' } });
-    
     const tagsInput = screen.getByLabelText(/Tags for this outfit/);
     fireEvent.change(tagsInput, { target: { value: ' , , ' } });
     
     fireEvent.click(screen.getByText('Create outfit'));
     
     expect(createOutfit).not.toHaveBeenCalled();
-
-    console.error = originalError;
   });
 
   it('closes modal after successful submission', async () => {

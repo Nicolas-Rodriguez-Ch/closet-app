@@ -98,17 +98,13 @@ const CarouselWrapper = () => {
       .split(',')
       .map((tag) => tag.trim())
       .filter(Boolean);
-      
-    if (!tags) {
+
+    if (tags.length === 0) {
       errors.outfitTags = 'At least one tag is required';
-    } else {
-      if (tags.length === 0) {
-        errors.outfitTags = 'Please provide valid tags';
-      } else if (tags.some((tag) => tag.length < 2)) {
-        errors.outfitTags = 'Each tag must be at least 2 characters long';
-      } else if (tags.length > 5) {
-        errors.outfitTags = 'Maximum 5 tags allowed';
-      }
+    } else if (tags.some((tag) => tag.length < 2)) {
+      errors.outfitTags = 'Each tag must be at least 2 characters long';
+    } else if (tags.length > 5) {
+      errors.outfitTags = 'Maximum 5 tags allowed';
     }
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
