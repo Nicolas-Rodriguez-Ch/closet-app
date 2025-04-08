@@ -27,7 +27,6 @@ const IndividualOutfitPage = () => {
     const confirmDelete = window.confirm(
       `Are you sure you want to delete this outfit? This action can't be undone.`
     );
-    console.log(id);
     if (confirmDelete) {
       toast.promise(
         dispatch(deleteOutfit(id))
@@ -73,7 +72,7 @@ const IndividualOutfitPage = () => {
           </div>
         </div>
       )}
-      {outfit && (
+      {status === 'succeeded' && outfit && (
         <div className='bg-palette-3 min-h-screen py-6 px-4'>
           <div className='container mx-auto max-w-4xl'>
             <div className='bg-white rounded-xl overflow-hidden shadow-lg'>
@@ -87,14 +86,16 @@ const IndividualOutfitPage = () => {
                   </p>
                 )}
                 <div className='mt-3 flex flex-wrap gap-2'>
-                  {outfit.tags.map((tag, index) => (
-                    <span
-                      key={index}
-                      className='px-3 py-1 bg-palette-4/30 rounded-full text-sm text-palette-2'
-                    >
-                      {tag}
-                    </span>
-                  ))}
+                  {outfit &&
+                    outfit.tags &&
+                    outfit.tags.map((tag, index) => (
+                      <span
+                        key={index}
+                        className='px-3 py-1 bg-palette-4/30 rounded-full text-sm text-palette-2'
+                      >
+                        {tag}
+                      </span>
+                    ))}
                 </div>
               </div>
 
