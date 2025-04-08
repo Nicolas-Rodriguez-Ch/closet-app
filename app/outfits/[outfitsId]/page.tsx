@@ -28,10 +28,10 @@ const IndividualOutfitPage = () => {
       `Are you sure you want to delete this outfit? This action can't be undone.`
     );
     if (confirmDelete) {
-      toast.promise(
+      await toast.promise(
         dispatch(deleteOutfit(id))
           .unwrap()
-          .then(() => {
+          .finally(() => {
             router.push('/');
           }),
         {
