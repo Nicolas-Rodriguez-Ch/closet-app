@@ -1,6 +1,7 @@
 import { CarouselComponentProps } from '@/lib/types';
 import React, { useEffect, useState } from 'react';
 import ApparelSlide from './ApparrelSlide/ApparelSlide';
+import Link from 'next/link';
 
 const CarouselComponent = ({
   item,
@@ -46,12 +47,12 @@ const CarouselComponent = ({
           </button>
         </div>
 
-        <div className='w-full h-[400px]'>
+        <Link href={`/apparel/${item[activeIndex].id}`} className='w-full h-[400px]'>
           <ApparelSlide
             imgSrc={item[activeIndex].pictureURL}
             title={item[activeIndex].title}
           />
-        </div>
+        </Link>
       </section>
     </div>
   );

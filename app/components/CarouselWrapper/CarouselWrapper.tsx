@@ -81,7 +81,7 @@ const CarouselWrapper = () => {
     setShowModal(true);
   };
 
-  const handleCreateOutfit = (e: FormEvent<HTMLFormElement>) => {
+  const handleCreateOutfit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const errors: {
@@ -136,16 +136,16 @@ const CarouselWrapper = () => {
     };
     if (!body.description) delete body.description;
 
-    toast.promise(
+    await toast.promise(
       dispatch(createOutfit(body))
         .unwrap()
-        .then(() => {
+        .finally(() => {
           setOutfitAdditionalInfo({
             outfitTitle: '',
             outfitTags: '',
             outfitDescription: '',
           });
-          setShowModal(false)
+          setShowModal(false);
           router.push('/outfits');
         }),
       {
