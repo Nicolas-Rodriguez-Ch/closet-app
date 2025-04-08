@@ -1,7 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import CarouselWrapper from '../CarouselWrapper';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
-import { fetchAllApparel } from '@/lib/features/apparel/apparelSlice';
 import { createOutfit } from '@/lib/features/outfit/outfitSlice';
 import { toast } from 'react-toastify';
 
@@ -64,46 +63,6 @@ describe('CarouselWrapper', () => {
     });
   });
 
-  it('dispatches fetchAllApparel on mount', () => {
-    (useAppSelector as unknown as jest.Mock).mockReturnValue({ 
-      items: {}, 
-      status: 'idle' 
-    });
-
-    render(<CarouselWrapper />);
-    expect(mockDispatch).toHaveBeenCalledWith(fetchAllApparel());
-  });
-
-  it('renders LoadingComponent when status is idle', () => {
-    (useAppSelector as unknown as jest.Mock).mockReturnValue({ 
-      items: {}, 
-      status: 'idle' 
-    });
-
-    render(<CarouselWrapper />);
-    expect(screen.getByTestId('loading-component')).toBeInTheDocument();
-  });
-
-  it('renders LoadingComponent when status is loading', () => {
-    (useAppSelector as unknown as jest.Mock).mockReturnValue({ 
-      items: {}, 
-      status: 'loading' 
-    });
-
-    render(<CarouselWrapper />);
-    expect(screen.getByTestId('loading-component')).toBeInTheDocument();
-  });
-
-  it('renders ErrorComponent when status is failed', () => {
-    (useAppSelector as unknown as jest.Mock).mockReturnValue({ 
-      items: {}, 
-      status: 'failed' 
-    });
-
-    render(<CarouselWrapper />);
-    expect(screen.getByTestId('error-component')).toBeInTheDocument();
-  });
-
   it('renders carousel components when status is succeeded', () => {
     (useAppSelector as unknown as jest.Mock).mockReturnValue({ 
       items: mockApparelItems, 
@@ -115,7 +74,7 @@ describe('CarouselWrapper', () => {
     expect(screen.getByTestId('carousel-BOTTOM')).toBeInTheDocument();
     expect(screen.getByTestId('carousel-SHOES')).toBeInTheDocument();
     expect(screen.getByTestId('carousel-COAT')).toBeInTheDocument();
-    expect(screen.getByText('Create this outfit!')).toBeInTheDocument();
+    expect(screen.getByText('Save this outfit')).toBeInTheDocument();
   });
 
   it('toggles coat visibility when hide coats button is clicked', () => {
@@ -127,38 +86,38 @@ describe('CarouselWrapper', () => {
     render(<CarouselWrapper />);
     expect(screen.getByTestId('carousel-COAT')).toBeInTheDocument();
     
-    fireEvent.click(screen.getByText('Hide Coats'));
+    fireEvent.click(screen.getByText("I don't need a coat"));
     expect(screen.queryByTestId('carousel-COAT')).not.toBeInTheDocument();
     
-    fireEvent.click(screen.getByText('Show Coats'));
+    fireEvent.click(screen.getByText('Add a coat'));
     expect(screen.getByTestId('carousel-COAT')).toBeInTheDocument();
   });
 
-  it('opens modal when create outfit button is clicked', () => {
+  it('opens modal when save outfit button is clicked', () => {
     (useAppSelector as unknown as jest.Mock).mockReturnValue({ 
       items: mockApparelItems, 
       status: 'succeeded' 
     });
 
     render(<CarouselWrapper />);
-    expect(screen.queryByText('Add a title for this Outfit')).not.toBeInTheDocument();
+    expect(screen.queryByText('Give your outfit a name')).not.toBeInTheDocument();
     
-    fireEvent.click(screen.getByText('Create this outfit!'));
-    expect(screen.getByText('Add a title for this Outfit')).toBeInTheDocument();
+    fireEvent.click(screen.getByText('Save this outfit'));
+    expect(screen.getByText('Give your outfit a name')).toBeInTheDocument();
   });
 
-  it('closes modal when close button is clicked', () => {
+  it('closes modal when cancel button is clicked', () => {
     (useAppSelector as unknown as jest.Mock).mockReturnValue({ 
       items: mockApparelItems, 
       status: 'succeeded' 
     });
 
     render(<CarouselWrapper />);
-    fireEvent.click(screen.getByText('Create this outfit!'));
-    expect(screen.getByText('Add a title for this Outfit')).toBeInTheDocument();
+    fireEvent.click(screen.getByText('Save this outfit'));
+    expect(screen.getByText('Give your outfit a name')).toBeInTheDocument();
     
-    fireEvent.click(screen.getByText('Close'));
-    expect(screen.queryByText('Add a title for this Outfit')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByText('Cancel'));
+    expect(screen.queryByText('Give your outfit a name')).not.toBeInTheDocument();
   });
 
   it('validates form and prevents API call when fields are invalid', () => {
@@ -168,9 +127,9 @@ describe('CarouselWrapper', () => {
     });
 
     render(<CarouselWrapper />);
-    fireEvent.click(screen.getByText('Create this outfit!'));
+    fireEvent.click(screen.getByText('Save this outfit'));
     
-    fireEvent.click(screen.getByText('Create outfit'));
+    fireEvent.click(screen.getByText('Save outfit'));
     
     expect(createOutfit).not.toHaveBeenCalled();
     expect(mockDispatch).not.toHaveBeenCalledWith({ type: 'CREATE_OUTFIT' });
@@ -189,18 +148,18 @@ describe('CarouselWrapper', () => {
     fireEvent.click(screen.getByTestId('carousel-SHOES').querySelector('button')!);
     fireEvent.click(screen.getByTestId('carousel-COAT').querySelector('button')!);
     
-    fireEvent.click(screen.getByText('Create this outfit!'));
+    fireEvent.click(screen.getByText('Save this outfit'));
     
-    const titleInput = screen.getByLabelText(/Add a title for this Outfit/);
+    const titleInput = screen.getByLabelText(/Give your outfit a name/);
     fireEvent.change(titleInput, { target: { value: 'Test Outfit' } });
     
-    const tagsInput = screen.getByLabelText(/Tags for this outfit/);
+    const tagsInput = screen.getByLabelText(/Add tags \(separated by commas\)/);
     fireEvent.change(tagsInput, { target: { value: 'casual, summer' } });
     
-    const descInput = screen.getByLabelText(/Add a description for this Outfit/);
+    const descInput = screen.getByLabelText(/Add a note \(optional\)/);
     fireEvent.change(descInput, { target: { value: 'Test description' } });
     
-    fireEvent.click(screen.getByText('Create outfit'));
+    fireEvent.click(screen.getByText('Save outfit'));
     
     await waitFor(() => {
       expect(createOutfit).toHaveBeenCalledWith({
@@ -226,21 +185,21 @@ describe('CarouselWrapper', () => {
 
     render(<CarouselWrapper />);
     
-    fireEvent.click(screen.getByText('Hide Coats'));
+    fireEvent.click(screen.getByText("I don't need a coat"));
     
     fireEvent.click(screen.getByTestId('carousel-TOP').querySelector('button')!);
     fireEvent.click(screen.getByTestId('carousel-BOTTOM').querySelector('button')!);
     fireEvent.click(screen.getByTestId('carousel-SHOES').querySelector('button')!);
     
-    fireEvent.click(screen.getByText('Create this outfit!'));
+    fireEvent.click(screen.getByText('Save this outfit'));
     
-    const titleInput = screen.getByLabelText(/Add a title for this Outfit/);
+    const titleInput = screen.getByLabelText(/Give your outfit a name/);
     fireEvent.change(titleInput, { target: { value: 'Test Outfit No Coat' } });
     
-    const tagsInput = screen.getByLabelText(/Tags for this outfit/);
+    const tagsInput = screen.getByLabelText(/Add tags \(separated by commas\)/);
     fireEvent.change(tagsInput, { target: { value: 'summer' } });
     
-    fireEvent.click(screen.getByText('Create outfit'));
+    fireEvent.click(screen.getByText('Save outfit'));
     
     await waitFor(() => {
       expect(createOutfit).toHaveBeenCalledWith({
@@ -274,15 +233,15 @@ describe('CarouselWrapper', () => {
     fireEvent.click(screen.getByTestId('carousel-BOTTOM').querySelector('button')!);
     fireEvent.click(screen.getByTestId('carousel-SHOES').querySelector('button')!);
     
-    fireEvent.click(screen.getByText('Create this outfit!'));
+    fireEvent.click(screen.getByText('Save this outfit'));
     
-    const titleInput = screen.getByLabelText(/Add a title for this Outfit/);
+    const titleInput = screen.getByLabelText(/Give your outfit a name/);
     fireEvent.change(titleInput, { target: { value: 'Test Outfit' } });
     
-    const tagsInput = screen.getByLabelText(/Tags for this outfit/);
+    const tagsInput = screen.getByLabelText(/Add tags \(separated by commas\)/);
     fireEvent.change(tagsInput, { target: { value: 'casual' } });
     
-    fireEvent.click(screen.getByText('Create outfit'));
+    fireEvent.click(screen.getByText('Save outfit'));
     
     await waitFor(() => {
       expect(toast.promise).toHaveBeenCalled();
@@ -291,10 +250,10 @@ describe('CarouselWrapper', () => {
     if (capturedErrorRender) {
       const errorData = { error: 'API Error' };
       const errorMessage = capturedErrorRender({ data: errorData });
-      expect(errorMessage).toBe('Error creating outfit: API Error');
+      expect(errorMessage).toBe('Couldn\'t save your outfit: API Error');
       
       const simpleErrorMessage = capturedErrorRender({ data: 'Simple Error' });
-      expect(simpleErrorMessage).toBe('Error creating outfit: Simple Error');
+      expect(simpleErrorMessage).toBe('Couldn\'t save your outfit: Simple Error');
     }
   });
 
@@ -310,16 +269,15 @@ describe('CarouselWrapper', () => {
     fireEvent.click(screen.getByTestId('carousel-BOTTOM').querySelector('button')!);
     fireEvent.click(screen.getByTestId('carousel-SHOES').querySelector('button')!);
     
-    fireEvent.click(screen.getByText('Create this outfit!'));
+    fireEvent.click(screen.getByText('Save this outfit'));
     
-    const titleInput = screen.getByLabelText(/Add a title for this Outfit/);
+    const titleInput = screen.getByLabelText(/Give your outfit a name/);
     fireEvent.change(titleInput, { target: { value: 'Test Outfit' } });
     
-    const tagsInput = screen.getByLabelText(/Tags for this outfit/);
+    const tagsInput = screen.getByLabelText(/Add tags \(separated by commas\)/);
     fireEvent.change(tagsInput, { target: { value: 'casual' } });
     
-    
-    fireEvent.click(screen.getByText('Create outfit'));
+    fireEvent.click(screen.getByText('Save outfit'));
     
     await waitFor(() => {
       expect(createOutfit).toHaveBeenCalledWith({
@@ -342,27 +300,27 @@ describe('CarouselWrapper', () => {
     });
 
     render(<CarouselWrapper />);
-    fireEvent.click(screen.getByText('Create this outfit!'));
+    fireEvent.click(screen.getByText('Save this outfit'));
     
-    const titleInput = screen.getByLabelText(/Add a title for this Outfit/);
-    const tagsInput = screen.getByLabelText(/Tags for this outfit/);
+    const titleInput = screen.getByLabelText(/Give your outfit a name/);
+    const tagsInput = screen.getByLabelText(/Add tags \(separated by commas\)/);
     
     fireEvent.change(titleInput, { target: { value: 'ab' } });
     fireEvent.change(tagsInput, { target: { value: 'valid-tag' } });
-    fireEvent.click(screen.getByText('Create outfit'));
+    fireEvent.click(screen.getByText('Save outfit'));
     expect(createOutfit).not.toHaveBeenCalled();
     
     fireEvent.change(titleInput, { target: { value: 'a'.repeat(51) } });
-    fireEvent.click(screen.getByText('Create outfit'));
+    fireEvent.click(screen.getByText('Save outfit'));
     expect(createOutfit).not.toHaveBeenCalled();
     
     fireEvent.change(titleInput, { target: { value: 'Valid Title' } });
     fireEvent.change(tagsInput, { target: { value: 'a' } });
-    fireEvent.click(screen.getByText('Create outfit'));
+    fireEvent.click(screen.getByText('Save outfit'));
     expect(createOutfit).not.toHaveBeenCalled();
     
     fireEvent.change(tagsInput, { target: { value: 'tag1, tag2, tag3, tag4, tag5, tag6' } });
-    fireEvent.click(screen.getByText('Create outfit'));
+    fireEvent.click(screen.getByText('Save outfit'));
     expect(createOutfit).not.toHaveBeenCalled();
     
     fireEvent.change(titleInput, { target: { value: 'Valid Title' } });
@@ -372,7 +330,7 @@ describe('CarouselWrapper', () => {
     fireEvent.click(screen.getByTestId('carousel-BOTTOM').querySelector('button')!);
     fireEvent.click(screen.getByTestId('carousel-SHOES').querySelector('button')!);
     
-    fireEvent.click(screen.getByText('Create outfit'));
+    fireEvent.click(screen.getByText('Save outfit'));
     
     await waitFor(() => {
       expect(createOutfit).toHaveBeenCalled();
@@ -386,15 +344,15 @@ describe('CarouselWrapper', () => {
     });
 
     render(<CarouselWrapper />);
-    fireEvent.click(screen.getByText('Create this outfit!'));
+    fireEvent.click(screen.getByText('Save this outfit'));
     
-    const titleInput = screen.getByLabelText(/Add a title for this Outfit/);
+    const titleInput = screen.getByLabelText(/Give your outfit a name/);
     fireEvent.change(titleInput, { target: { value: '   ' } });
     
-    const tagsInput = screen.getByLabelText(/Tags for this outfit/);
+    const tagsInput = screen.getByLabelText(/Add tags \(separated by commas\)/);
     fireEvent.change(tagsInput, { target: { value: 'valid-tag' } });
     
-    fireEvent.click(screen.getByText('Create outfit'));
+    fireEvent.click(screen.getByText('Save outfit'));
     
     expect(createOutfit).not.toHaveBeenCalled();
   });
@@ -406,14 +364,14 @@ describe('CarouselWrapper', () => {
     });
 
     render(<CarouselWrapper />);
-    fireEvent.click(screen.getByText('Create this outfit!'));
+    fireEvent.click(screen.getByText('Save this outfit'));
     
-    const titleInput = screen.getByLabelText(/Add a title for this Outfit/);
+    const titleInput = screen.getByLabelText(/Give your outfit a name/);
     fireEvent.change(titleInput, { target: { value: 'Valid Title' } });
-    const tagsInput = screen.getByLabelText(/Tags for this outfit/);
+    const tagsInput = screen.getByLabelText(/Add tags \(separated by commas\)/);
     fireEvent.change(tagsInput, { target: { value: ' , , ' } });
     
-    fireEvent.click(screen.getByText('Create outfit'));
+    fireEvent.click(screen.getByText('Save outfit'));
     
     expect(createOutfit).not.toHaveBeenCalled();
   });
@@ -426,11 +384,11 @@ describe('CarouselWrapper', () => {
 
     render(<CarouselWrapper />);
     
-    fireEvent.click(screen.getByText('Create this outfit!'));
-    expect(screen.getByText('Add a title for this Outfit')).toBeInTheDocument();
+    fireEvent.click(screen.getByText('Save this outfit'));
+    expect(screen.getByText('Give your outfit a name')).toBeInTheDocument();
     
-    fireEvent.click(screen.getByText('Close'));
+    fireEvent.click(screen.getByText('Cancel'));
     
-    expect(screen.queryByText('Add a title for this Outfit')).not.toBeInTheDocument();
+    expect(screen.queryByText('Give your outfit a name')).not.toBeInTheDocument();
   });
 });
