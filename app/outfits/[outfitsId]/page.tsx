@@ -4,9 +4,13 @@ import { useParams, useRouter } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import LoadingComponent from '@/app/components/LoadingComponent/LoadingComponent';
 import ErrorComponent from '@/app/components/ErrorComponent/ErrorComponent';
-import { fetchAllOutfits } from '@/lib/features/outfit/outfitSlice';
+import {
+  deleteOutfit,
+  fetchAllOutfits,
+} from '@/lib/features/outfit/outfitSlice';
 import Image from 'next/image';
 import Link from 'next/link';
+import { toast } from 'react-toastify';
 
 const IndividualOutfitPage = () => {
   const params = useParams();
@@ -18,6 +22,31 @@ const IndividualOutfitPage = () => {
   const outfit = useAppSelector((state) =>
     state.outfit.items.find((item) => item.id === outfitId)
   );
+
+  const handleDeleteOutfit = async (id: string) => {
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete this outfit? This action can't be undone.`
+    );
+    console.log(id);
+    if (confirmDelete) {
+      toast.promise(
+        dispatch(deleteOutfit(id))
+          .unwrap()
+          .then(() => {
+            router.push('/');
+          }),
+        {
+          pending: 'Deleting this outfit, please wait.',
+          success: 'Outfit deleted succesully, redirecting you to home page.',
+          error: {
+            render({ data }: any) {
+              return `Error deleting outfit: ${data?.error || data}`;
+            },
+          },
+        }
+      );
+    }
+  };
 
   useEffect(() => {
     if (status === 'idle' || (status === 'succeeded' && items.length === 0)) {
@@ -80,7 +109,10 @@ const IndividualOutfitPage = () => {
                       <h2 className='text-xl font-semibold text-palette-2 mb-2'>
                         Coat
                       </h2>
-                      <div className='relative w-full h-64 flex items-start justify-center mb-2'>
+                      <Link
+                        href={`/apparel/${outfit.coatID.id}`}
+                        className='relative w-full h-64 flex items-start justify-center mb-2'
+                      >
                         <Image
                           src={outfit.coatID.pictureURL}
                           alt={outfit.coatID.title}
@@ -88,7 +120,7 @@ const IndividualOutfitPage = () => {
                           sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
                           className='object-contain object-top'
                         />
-                      </div>
+                      </Link>
                       <h3 className='text-palette-2'>{outfit.coatID.title}</h3>
                     </div>
                   )}
@@ -97,7 +129,10 @@ const IndividualOutfitPage = () => {
                     <h2 className='text-xl font-semibold text-palette-2 mb-2'>
                       Top
                     </h2>
-                    <div className='relative w-full h-64 flex items-start justify-center mb-2'>
+                    <Link
+                      href={`/apparel/${outfit.topID.id}`}
+                      className='relative w-full h-64 flex items-start justify-center mb-2'
+                    >
                       <Image
                         src={outfit.topID.pictureURL}
                         alt={outfit.topID.title}
@@ -105,7 +140,7 @@ const IndividualOutfitPage = () => {
                         sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
                         className='object-contain object-top'
                       />
-                    </div>
+                    </Link>
                     <h3 className='text-palette-2'>{outfit.topID.title}</h3>
                   </div>
 
@@ -113,7 +148,10 @@ const IndividualOutfitPage = () => {
                     <h2 className='text-xl font-semibold text-palette-2 mb-2'>
                       Bottom
                     </h2>
-                    <div className='relative w-full h-64 flex items-start justify-center mb-2'>
+                    <Link
+                      href={`/apparel/${outfit.bottomID.id}`}
+                      className='relative w-full h-64 flex items-start justify-center mb-2'
+                    >
                       <Image
                         src={outfit.bottomID.pictureURL}
                         alt={outfit.bottomID.title}
@@ -121,7 +159,7 @@ const IndividualOutfitPage = () => {
                         sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
                         className='object-contain object-top'
                       />
-                    </div>
+                    </Link>
                     <h3 className='text-palette-2'>{outfit.bottomID.title}</h3>
                   </div>
 
@@ -129,7 +167,10 @@ const IndividualOutfitPage = () => {
                     <h2 className='text-xl font-semibold text-palette-2 mb-2'>
                       Shoes
                     </h2>
-                    <div className='relative w-full h-64 flex items-start justify-center mb-2'>
+                    <Link
+                      href={`/apparel/${outfit.shoesID.id}`}
+                      className='relative w-full h-64 flex items-start justify-center mb-2'
+                    >
                       <Image
                         src={outfit.shoesID.pictureURL}
                         alt={outfit.shoesID.title}
@@ -137,14 +178,17 @@ const IndividualOutfitPage = () => {
                         sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
                         className='object-contain object-top'
                       />
-                    </div>
+                    </Link>
                     <h3 className='text-palette-2'>{outfit.shoesID.title}</h3>
                   </div>
                 </div>
               </div>
 
               <div className='p-6 border-t border-palette-4/20 flex justify-around'>
-                <button className='px-4 py-2 cursor-pointer bg-palette-4 hover:bg-palette-2 rounded-lg text-white transition-colors'>
+                <button
+                  onClick={() => handleDeleteOutfit(outfit.id)}
+                  className='px-4 py-2 cursor-pointer bg-palette-4 hover:bg-palette-2 rounded-lg text-white transition-colors'
+                >
                   Delete outfit
                 </button>
                 <button
