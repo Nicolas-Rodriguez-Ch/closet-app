@@ -25,11 +25,11 @@ const CarouselComponent = ({
   };
 
   return (
-    <div className='w-full px-4 py-4 md:py-16 bg-palette-3'>
+    <div className='w-full px-4 py-4 md:py-8 bg-palette-3'>
       <section className='w-full max-w-[500px] mx-auto flex flex-col items-center space-y-4 bg-white rounded-lg shadow-md p-4'>
-        <h1 className='text-lg font-bold text-palette-2 uppercase tracking-wider'>
+        <h2 className='text-lg font-bold text-palette-2 capitalize'>
           {category}
-        </h1>
+        </h2>
 
         <div className='flex items-center justify-between w-full gap-4'>
           <button
@@ -47,12 +47,20 @@ const CarouselComponent = ({
           </button>
         </div>
 
-        <Link href={`/apparel/${item[activeIndex].id}`} className='w-full h-[400px]'>
+        <Link
+          href={`/apparel/${item[activeIndex].id}`}
+          className='w-full'
+          aria-label={`View details of ${item[activeIndex].title}`}
+        >
           <ApparelSlide
             imgSrc={item[activeIndex].pictureURL}
             title={item[activeIndex].title}
           />
         </Link>
+
+        <p className='text-xs text-palette-5 text-center mt-2'>
+          Tap the image to view or edit details
+        </p>
       </section>
     </div>
   );

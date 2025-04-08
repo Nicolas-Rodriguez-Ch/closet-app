@@ -147,19 +147,25 @@ const UploadForm = () => {
 
   return (
     <div className='w-full bg-palette-3 min-h-screen py-6 px-4'>
+      <div className='py-1 px-6 mb-2 text-center rounded-lg mx-auto max-w-md md:max-w-4xl lg:max-w-6xl'>
+        <h1 className='text-2xl md:text-3xl font-bold text-palette-2 mb-3'>
+          Add to Your Wardrobe
+        </h1>
+        <p className='text-palette-5 text-sm md:text-base'>
+          Upload your clothing items to build your digital collection
+        </p>
+      </div>
+
       <form
         onSubmit={handleSubmit}
         className='flex flex-col gap-3.5 justify-center content-center w-full max-w-md mx-auto md:max-w-4xl lg:max-w-6xl'
         aria-label='Apparel upload form'
       >
-        <h2 className='text-xl md:text-2xl font-bold text-palette-2 mb-4 md:mb-6 text-center'>
-          Add New Apparel
-        </h2>
         <div className='w-full md:grid md:grid-cols-2 md:gap-6 lg:gap-8'>
           <section className='flex flex-col bg-white bg-opacity-70 rounded-3xl p-5 mb-4 md:mb-0'>
             <label
               htmlFor='imageUpload'
-              className='cursor-pointer font-medium text-palette-2 mb-3 block'
+              className='cursor-pointer font-bold text-palette-2 mb-3 block text-lg'
             >
               Upload Apparel Image <span className='text-palette-5'>*</span>
             </label>
@@ -203,7 +209,7 @@ const UploadForm = () => {
             <section className='flex flex-col gap-3 p-5 bg-white bg-opacity-70 rounded-3xl'>
               <label
                 htmlFor='apparelTitle'
-                className='cursor-pointer font-medium text-palette-2 mb-3'
+                className='cursor-pointer font-bold text-lg text-palette-2 mb-3'
               >
                 Apparel Item Title <span className='text-palette-5'>*</span>
               </label>
@@ -240,7 +246,7 @@ const UploadForm = () => {
             <section className='flex flex-col gap-3 p-5 bg-white bg-opacity-70 rounded-3xl'>
               <label
                 htmlFor='apparelDescription'
-                className='cursor-pointer font-medium text-palette-2 mb-3'
+                className='cursor-pointer font-bold text-lg text-palette-2 mb-3'
               >
                 Apparel Description
               </label>
@@ -258,7 +264,7 @@ const UploadForm = () => {
             <section className='flex flex-col gap-3 p-5 bg-white bg-opacity-70 rounded-3xl'>
               <label
                 htmlFor='apparelType'
-                className='cursor-pointer font-medium text-palette-2 mb-3'
+                className='cursor-pointer font-bold text-lg text-palette-2 mb-3'
               >
                 Apparel Type <span className='text-palette-5'>*</span>
               </label>

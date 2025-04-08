@@ -52,7 +52,7 @@ describe('UploadForm', () => {
   test('renders form elements correctly', () => {
     render(<UploadForm />);
 
-    expect(screen.getByText(/Add New Apparel/i)).toBeInTheDocument();
+    expect(screen.getByText(/Add to Your Wardrobe/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Upload Apparel Image/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Apparel Item Title/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Apparel Description/i)).toBeInTheDocument();

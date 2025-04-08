@@ -1,4 +1,5 @@
 'use client';
+
 import { fetchAllApparel } from '@/lib/features/apparel/apparelSlice';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react';
@@ -90,11 +91,11 @@ const CarouselWrapper = () => {
     } = {};
 
     if (!oufitAdditionalInfo.outfitTitle.trim()) {
-      errors.outfitTitle = 'Outfit title is required';
+      errors.outfitTitle = 'Please add a name for your outfit';
     } else if (oufitAdditionalInfo.outfitTitle.length < 3) {
-      errors.outfitTitle = 'Title must be at least 3 characters long';
+      errors.outfitTitle = 'Name needs to be at least 3 characters';
     } else if (oufitAdditionalInfo.outfitTitle.length > 50) {
-      errors.outfitTitle = 'Title cannot exceed 50 characters';
+      errors.outfitTitle = 'Name cannot be longer than 50 characters';
     }
     const tags = oufitAdditionalInfo.outfitTags
       .split(',')
@@ -102,11 +103,11 @@ const CarouselWrapper = () => {
       .filter(Boolean);
 
     if (tags.length === 0) {
-      errors.outfitTags = 'At least one tag is required';
+      errors.outfitTags = 'Please add at least one tag (e.g., casual, formal)';
     } else if (tags.some((tag) => tag.length < 2)) {
-      errors.outfitTags = 'Each tag must be at least 2 characters long';
+      errors.outfitTags = 'Each tag should be at least 2 characters';
     } else if (tags.length > 5) {
-      errors.outfitTags = 'Maximum 5 tags allowed';
+      errors.outfitTags = 'You can add up to 5 tags only';
     }
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
@@ -149,11 +150,11 @@ const CarouselWrapper = () => {
           router.push('/outfits');
         }),
       {
-        pending: 'Creating your outfit',
-        success: 'Outfit created successfully!',
+        pending: 'Creating your outfit...',
+        success: 'Your outfit has been saved!',
         error: {
           render({ data }: any) {
-            return `Error creating outfit: ${data?.error || data}`;
+            return `Couldn't save your outfit: ${data?.error || data}`;
           },
         },
       }
@@ -166,11 +167,16 @@ const CarouselWrapper = () => {
       {status === 'failed' && <ErrorComponent />}
       {status === 'succeeded' && (
         <>
+          <div className="p-2 text-center rounded-lg mx-4">
+            <h1 className="text-xl md:text-2xl font-semibold text-palette-2 mb-2">Build Your Outfit</h1>
+            <p className="text-palette-5 text-sm md:text-base">Browse through your clothes and create the perfect combination</p>
+          </div>
+          
           <button
             onClick={toggleCoats}
-            className='bg-palette-1 text-white p-2 rounded-full text-sm shadow-md hover:bg-palette-5 transition-colors duration-300 ease-in-out self-start m-2 md:absolute md:top-[initial] md:left-[initial] sm:p-3 sm:text-base'
+            className='bg-palette-1 text-white p-2 rounded-full text-sm shadow-md hover:bg-palette-5 transition-colors duration-300 ease-in-out self-start m-2 md:absolute md:top-30 md:left-[initial] sm:p-3 sm:text-base'
           >
-            {showCoats ? 'Hide Coats' : 'Show Coats'}
+            {showCoats ? 'I don\'t need a coat' : 'Add a coat'}
           </button>
           <div className='md:grid md:grid-cols-[repeat(auto-fit,minmax(300px,1fr))] md:gap-4'>
             {Object.entries(items)
@@ -186,24 +192,25 @@ const CarouselWrapper = () => {
                 />
               ))}
           </div>
-          <div className='flex justify-center'>
+          <div className='flex justify-center mt-6'>
             <button
               onClick={createOutfitBtn}
-              className='bg-palette-1 text-white p-4 mb-4 rounded-4xl hover:bg-palette-5 transition-colors font-bold'
+              className='bg-palette-1 text-white p-4 rounded-lg hover:bg-palette-5 transition-colors font-bold text-lg mb-8'
             >
-              Create this outfit!
+              Save this outfit
             </button>
           </div>
           {showModal ? (
             <div className='fixed inset-0 z-50 flex items-center justify-center bg-palette-2/50'>
               <div className='w-11/12 max-w-md p-6 rounded-xl bg-palette-3 backdrop-blur-lg border border-white/30 shadow-2xl relative'>
+                <h2 className="text-xl text-palette-2 font-semibold mb-4 text-center">Finish Your Outfit</h2>
                 <form onSubmit={handleCreateOutfit} className='space-y-5'>
                   <div className='bg-white p-4 rounded-xl shadow-sm'>
                     <label
                       htmlFor='outfitTitle'
                       className='block text-palette-2 font-semibold mb-2'
                     >
-                      Add a title for this Outfit
+                      Give your outfit a name
                       <span className='text-palette-5'>*</span>
                     </label>
                     <input
@@ -212,7 +219,7 @@ const CarouselWrapper = () => {
                       name='outfitTitle'
                       id='outfitTitle'
                       value={oufitAdditionalInfo.outfitTitle}
-                      placeholder='Comfortable outerwear'
+                      placeholder='Summer casual'
                       onChange={handleChange}
                       className='w-full p-2 rounded-md bg-white/50 border border-palette-4/50 focus:outline-none focus:ring-2 focus:ring-palette-5/50 text-palette-2 placeholder-palette-2/50 transition-all duration-200'
                     />
@@ -227,7 +234,7 @@ const CarouselWrapper = () => {
                       htmlFor='outfitTags'
                       className='block text-palette-2 font-semibold mb-2'
                     >
-                      Tags for this outfit, separate them with comma
+                      Add tags (separated by commas)
                       <span className='text-palette-5'>*</span>
                     </label>
                     <input
@@ -236,10 +243,11 @@ const CarouselWrapper = () => {
                       name='outfitTags'
                       id='outfitTags'
                       value={oufitAdditionalInfo.outfitTags}
-                      placeholder='outdoors, comfortable, casual'
+                      placeholder='casual, summer, weekend'
                       onChange={handleChange}
                       className='w-full p-2 rounded-md bg-white/50 border border-palette-4/50 focus:outline-none focus:ring-2 focus:ring-palette-5/50 text-palette-2 placeholder-palette-2/50 transition-all duration-200'
                     />
+                    <p className="text-xs text-palette-5 mt-1">Example: casual, work, date night (max 5 tags)</p>
                     {formErrors.outfitTags && (
                       <p className='text-red-500 text-sm mt-1'>
                         {formErrors.outfitTags}
@@ -251,14 +259,14 @@ const CarouselWrapper = () => {
                       htmlFor='outfitDescription'
                       className='block text-palette-2 font-semibold mb-2'
                     >
-                      Add a description for this Outfit
+                      Add a note (optional)
                     </label>
                     <input
                       type='text'
                       name='outfitDescription'
                       id='outfitDescription'
                       value={oufitAdditionalInfo.outfitDescription}
-                      placeholder='This is a comfortable outfit for sunny days.'
+                      placeholder='Perfect for a sunny day at the park'
                       onChange={handleChange}
                       className='w-full p-2 rounded-md bg-white/50 border border-palette-4/50 focus:outline-none focus:ring-2 focus:ring-palette-5/50 text-palette-2 placeholder-palette-2/50 transition-all duration-200'
                     />
@@ -269,13 +277,13 @@ const CarouselWrapper = () => {
                       onClick={closeModal}
                       className='px-4 py-2 rounded-full bg-palette-4/50 text-palette-2 hover:bg-palette-4 transition-colors'
                     >
-                      Close
+                      Cancel
                     </button>
                     <button
                       type='submit'
                       className='px-4 py-2 rounded-full bg-palette-1 text-white hover:bg-palette-5 transition-colors'
                     >
-                      Create outfit
+                      Save outfit
                     </button>
                   </div>
                 </form>
