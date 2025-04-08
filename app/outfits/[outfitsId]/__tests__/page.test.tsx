@@ -125,10 +125,20 @@ describe('IndividualOutfitPage', () => {
     );
 
     window.confirm = jest.fn();
+
+    (useAppSelector as unknown as jest.Mock).mockImplementation((selector) => {
+      const state = {
+        outfit: {
+          items: [mockOutfit],
+          status: 'succeeded'
+        }
+      };
+      return selector(state);
+    });
   });
 
   it('dispatches fetchAllOutfits when status is idle', () => {
-    (useAppSelector as unknown as jest.Mock).mockReturnValue({
+    (useAppSelector as unknown as jest.Mock).mockReturnValueOnce({
       items: [],
       status: 'idle',
     });
@@ -139,27 +149,20 @@ describe('IndividualOutfitPage', () => {
   });
 
   it('dispatches fetchAllOutfits when status is succeeded but items array is empty', () => {
-    (useAppSelector as unknown as jest.Mock).mockImplementationOnce(() => {
-      return {
-        items: [],
-        status: 'succeeded',
-      };
-    });
-
-    (useAppSelector as unknown as jest.Mock).mockImplementationOnce(() => {
-      return null;
-    });
+    (useAppSelector as unknown as jest.Mock).mockImplementationOnce(() => ({
+      items: [],
+      status: 'succeeded',
+    })).mockImplementationOnce(() => null);
 
     render(<IndividualOutfitPage />);
 
     expect(mockDispatch).toHaveBeenCalledWith(fetchAllOutfits());
   });
+
   it('shows loading component when status is idle', () => {
-    (useAppSelector as unknown as jest.Mock).mockImplementation(() => {
-      return {
-        items: [],
-        status: 'idle',
-      };
+    (useAppSelector as unknown as jest.Mock).mockReturnValueOnce({
+      items: [],
+      status: 'idle',
     });
 
     render(<IndividualOutfitPage />);
@@ -168,11 +171,9 @@ describe('IndividualOutfitPage', () => {
   });
 
   it('shows loading component when status is loading', () => {
-    (useAppSelector as unknown as jest.Mock).mockImplementation(() => {
-      return {
-        items: [],
-        status: 'loading',
-      };
+    (useAppSelector as unknown as jest.Mock).mockReturnValueOnce({
+      items: [],
+      status: 'loading',
     });
 
     render(<IndividualOutfitPage />);
@@ -181,11 +182,9 @@ describe('IndividualOutfitPage', () => {
   });
 
   it('shows error component when status is failed', () => {
-    (useAppSelector as unknown as jest.Mock).mockImplementation(() => {
-      return {
-        items: [],
-        status: 'failed',
-      };
+    (useAppSelector as unknown as jest.Mock).mockReturnValueOnce({
+      items: [],
+      status: 'failed',
     });
 
     render(<IndividualOutfitPage />);
@@ -197,17 +196,22 @@ describe('IndividualOutfitPage', () => {
 
   it('shows not found message when status is succeeded but outfit is not found', () => {
     (useAppSelector as unknown as jest.Mock).mockImplementation((selector) => {
+      const state = {
+        outfit: {
+          items: [{ id: 'different-id' }],
+          status: 'succeeded'
+        }
+      };
+      
       if (selector.toString().includes('find')) {
         return null;
       }
-      return {
-        items: [{ id: 'different-id' }],
-        status: 'succeeded',
-      };
+      
+      return state.outfit;
     });
-
+  
     render(<IndividualOutfitPage />);
-
+  
     expect(screen.getByText('Outfit Not Found')).toBeInTheDocument();
     expect(
       screen.getByText(
@@ -218,16 +222,6 @@ describe('IndividualOutfitPage', () => {
   });
 
   it('displays outfit details when outfit is found', () => {
-    (useAppSelector as unknown as jest.Mock).mockImplementation((selector) => {
-      if (selector.toString().includes('find')) {
-        return mockOutfit;
-      }
-      return {
-        items: [mockOutfit],
-        status: 'succeeded',
-      };
-    });
-
     render(<IndividualOutfitPage />);
 
     expect(screen.getByText('Test Outfit')).toBeInTheDocument();
@@ -252,13 +246,13 @@ describe('IndividualOutfitPage', () => {
 
   it('displays outfit without coat when coatID is not present', () => {
     (useAppSelector as unknown as jest.Mock).mockImplementation((selector) => {
-      if (selector.toString().includes('find')) {
-        return mockOutfitNoCoat;
-      }
-      return {
-        items: [mockOutfitNoCoat],
-        status: 'succeeded',
+      const state = {
+        outfit: {
+          items: [mockOutfitNoCoat],
+          status: 'succeeded'
+        }
       };
+      return selector(state);
     });
 
     render(<IndividualOutfitPage />);
@@ -271,16 +265,6 @@ describe('IndividualOutfitPage', () => {
   });
 
   it('navigates back to outfits when the back button is clicked', () => {
-    (useAppSelector as unknown as jest.Mock).mockImplementation((selector) => {
-      if (selector.toString().includes('find')) {
-        return mockOutfit;
-      }
-      return {
-        items: [mockOutfit],
-        status: 'succeeded',
-      };
-    });
-
     render(<IndividualOutfitPage />);
 
     fireEvent.click(screen.getByText('Back to Outfits'));
@@ -288,16 +272,6 @@ describe('IndividualOutfitPage', () => {
   });
 
   it('deletes the outfit when delete button is clicked and confirmed', async () => {
-    (useAppSelector as unknown as jest.Mock).mockImplementation((selector) => {
-      if (selector.toString().includes('find')) {
-        return mockOutfit;
-      }
-      return {
-        items: [mockOutfit],
-        status: 'succeeded',
-      };
-    });
-
     (window.confirm as jest.Mock).mockReturnValue(true);
 
     render(<IndividualOutfitPage />);
@@ -317,16 +291,6 @@ describe('IndividualOutfitPage', () => {
   });
 
   it('does not delete the outfit when delete is canceled', () => {
-    (useAppSelector as unknown as jest.Mock).mockImplementation((selector) => {
-      if (selector.toString().includes('find')) {
-        return mockOutfit;
-      }
-      return {
-        items: [mockOutfit],
-        status: 'succeeded',
-      };
-    });
-
     (window.confirm as jest.Mock).mockReturnValue(false);
 
     render(<IndividualOutfitPage />);
@@ -339,16 +303,6 @@ describe('IndividualOutfitPage', () => {
   });
 
   it('renders the correct number of apparel items with appropriate links', () => {
-    (useAppSelector as unknown as jest.Mock).mockImplementation((selector) => {
-      if (selector.toString().includes('find')) {
-        return mockOutfit;
-      }
-      return {
-        items: [mockOutfit],
-        status: 'succeeded',
-      };
-    });
-
     render(<IndividualOutfitPage />);
 
     const links = screen.getAllByTestId('mock-link');
@@ -361,16 +315,6 @@ describe('IndividualOutfitPage', () => {
   });
 
   it('handles delete error correctly', async () => {
-    (useAppSelector as unknown as jest.Mock).mockImplementation((selector) => {
-      if (selector.toString().includes('find')) {
-        return mockOutfit;
-      }
-      return {
-        items: [mockOutfit],
-        status: 'succeeded',
-      };
-    });
-
     (window.confirm as jest.Mock).mockReturnValue(true);
 
     mockUnwrap.mockImplementation(() => Promise.reject('Delete failed'));
@@ -396,5 +340,4 @@ describe('IndividualOutfitPage', () => {
       expect(errorMessage).toBe('Error deleting outfit: Delete failed');
     }
   });
- 
 });
