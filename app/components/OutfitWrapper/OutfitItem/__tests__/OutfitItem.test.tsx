@@ -81,7 +81,7 @@ describe('OutfitItem', () => {
     render(<OutfitItem item={mockOutfit} />);
 
     const link = screen.getByTestId('next-link');
-    expect(link).toHaveAttribute('href', '/outfit/outfit-1');
+    expect(link).toHaveAttribute('href', '/outfits/outfit-1');
   });
 
   test('renders with responsive classes for different screen sizes', () => {
