@@ -5,6 +5,7 @@ import { HTML_DESCRIPTION, HTML_HEADER } from '@/public/constants/secrets';
 import ToastNotifier from './components/ToastNotifier/ToastNotifier';
 import { feligne } from '../lib/fonts';
 import StoreProvider from './StoreProvider';
+import Footer from './components/Footer/Footer';
 
 export const metadata: Metadata = {
   title: HTML_HEADER,
@@ -30,6 +31,7 @@ export default function RootLayout({
           <ToastNotifier />
           <NavBar />
           {children}
+          <Footer/>
         </StoreProvider>
       </body>
     </html>
