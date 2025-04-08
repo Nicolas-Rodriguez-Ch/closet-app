@@ -112,7 +112,7 @@ const ApparelItemPage = () => {
                     {apparelItem.description}
                   </p>
                 )}
-                <div className='bg-palette-4/10 rounded-lg p-4 mb-6'>
+                <div className='rounded-lg p-4 mb-6'>
                   <span className='block text-palette-2 font-semibold mb-2'>
                     Type
                   </span>
