@@ -65,8 +65,8 @@ const ApparelItemPage = () => {
       {(status === 'idle' || status === 'loading') && <LoadingComponent />}
       {status === 'failed' && <ErrorComponent />}
       {status === 'succeeded' && !apparelItem && (
-        <div className='flex flex-col items-center justify-center min-h-screen bg-palette-3 p-4'>
-          <div className='text-center max-w-md space-y-6'>
+        <div className='flex min-h-screen flex-col items-center justify-center bg-palette-3 px-4 py-6 sm:px-6'>
+          <div className='max-w-md space-y-6 rounded-[1.5rem] border border-white/70 bg-white/80 p-6 text-center shadow-[0_18px_45px_rgba(79,64,54,0.12)] backdrop-blur-sm sm:p-8'>
             <h1 className='text-2xl font-bold text-palette-2'>
               Apparel Item Not Found
             </h1>
@@ -74,67 +74,73 @@ const ApparelItemPage = () => {
               The apparel item you are looking for does not exist or has been
               removed.
             </p>
-            <button className='bg-palette-1 text-white p-3 rounded-lg hover:bg-palette-5 transition-colors'>
+            <button className='rounded-full bg-palette-1 px-4 py-3 text-white transition-colors hover:bg-palette-5'>
               <Link href='/apparel'>Return to Apparel</Link>
             </button>
           </div>
         </div>
       )}
       {status === 'succeeded' && apparelItem && (
-        <div className='bg-palette-3 min-h-screen py-6 px-4 flex md:pt-9 justify-center'>
-          <div className='w-full md:h-3/4 max-w-3xl bg-white rounded-xl shadow-lg overflow-hidden flex flex-col md:flex-row'>
-            <div className='block md:hidden p-6'>
-              <h1 className='text-3xl font-bold text-palette-2 mb-4'>
+        <div className='min-h-screen bg-palette-3 px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10'>
+          <article className='mx-auto w-full max-w-5xl overflow-hidden rounded-[1.75rem] border border-white/70 bg-white/85 shadow-[0_24px_60px_rgba(79,64,54,0.14)] backdrop-blur-sm lg:grid lg:grid-cols-[1.3fr_0.7fr]'>
+            <div className='border-b border-palette-4/30 bg-palette-4/10 p-5 sm:p-6 lg:hidden'>
+              <h1 className='text-3xl font-bold text-palette-2'>
                 {apparelItem.title}
               </h1>
               {apparelItem.description && (
-                <p className='text-palette-5 mb-6 italic'>
+                <p className='mt-3 text-palette-5 italic'>
                   {apparelItem.description}
                 </p>
               )}
             </div>
-            <div className='md:w-2/3 relative h-[500px] bg-palette-4/10'>
+
+            <div className='relative min-h-[22rem] bg-gradient-to-br from-white via-palette-3 to-palette-4/15 p-4 sm:min-h-[32rem] sm:p-6 lg:min-h-[44rem]'>
               <Image
                 src={apparelItem.pictureURL}
                 alt={apparelItem.title}
                 fill
-                sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
-                className='object-contain object-center p-6'
+                sizes='(max-width: 768px) 100vw, (max-width: 1200px) 60vw, 50vw'
+                className='object-contain object-center p-3 sm:p-6'
               />
             </div>
-            <div className='md:w-1/3 p-8 flex flex-col justify-between md:justify-normal'>
-              <div className='hidden md:block'>
-                <h1 className='text-3xl font-bold text-palette-2 mb-4'>
+
+            <div className='flex flex-col justify-between gap-6 p-5 sm:p-6 lg:p-8'>
+              <div className='hidden lg:block'>
+                <h1 className='text-3xl font-bold text-palette-2'>
                   {apparelItem.title}
                 </h1>
                 {apparelItem.description && (
-                  <p className='text-palette-5 mb-6 italic'>
+                  <p className='mt-3 text-palette-5 italic'>
                     {apparelItem.description}
                   </p>
                 )}
-                <div className='rounded-lg p-4 mb-6'>
-                  <span className='block text-palette-2 font-semibold mb-2'>
-                    Type
-                  </span>
-                  <span className='text-palette-5'>{apparelItem.type}</span>
-                </div>
               </div>
-              <div className='flex flex-col space-y-4'>
+
+              <div className='rounded-[1.25rem] border border-palette-4/30 bg-palette-4/10 p-4 sm:p-5'>
+                <span className='block text-xs font-semibold uppercase tracking-[0.22em] text-palette-5'>
+                  Type
+                </span>
+                <span className='mt-2 block text-lg font-semibold text-palette-2'>
+                  {apparelItem.type}
+                </span>
+              </div>
+
+              <div className='flex flex-col gap-4 sm:flex-row'>
                 <button
                   onClick={() => handleDeleteApparel(apparelItem.id)}
-                  className='w-full px-4 py-3 bg-palette-4 hover:bg-palette-2 rounded-lg text-white transition-colors'
+                  className='w-full rounded-full bg-palette-4 px-4 py-3 text-white transition-colors hover:bg-palette-2'
                 >
                   Delete Apparel Item
                 </button>
                 <button
                   onClick={() => router.push('/')}
-                  className='w-full px-4 py-3 bg-palette-5 text-white rounded-lg hover:bg-palette-2 transition-colors'
+                  className='w-full rounded-full bg-palette-5 px-4 py-3 text-white transition-colors hover:bg-palette-2'
                 >
                   Back to home
                 </button>
               </div>
             </div>
-          </div>
+          </article>
         </div>
       )}
     </>

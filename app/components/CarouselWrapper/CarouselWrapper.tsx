@@ -167,17 +167,20 @@ const CarouselWrapper = () => {
       {status === 'failed' && <ErrorComponent />}
       {status === 'succeeded' && (
         <>
-          <div className="p-2 text-center rounded-lg mx-4">
-            <h1 className="text-xl md:text-2xl font-semibold text-palette-2 mb-2">Build Your Outfit</h1>
-            <p className="text-palette-5 text-sm md:text-base">Browse through your clothes and create the perfect combination</p>
+          <div className='p-2 text-center rounded-lg mx-4'>
+            <h1 className='text-xl md:text-2xl font-semibold text-palette-2 mb-2'>Build Your Outfit</h1>
+            <p className='text-palette-5 text-sm md:text-base'>Browse through your clothes and create the perfect combination</p>
           </div>
-          
+
+          <div className='flex justify-start'>
           <button
             onClick={toggleCoats}
             className='bg-palette-1 text-white p-2 rounded-full text-sm shadow-md hover:bg-palette-5 transition-colors duration-300 ease-in-out self-start m-2 md:absolute md:top-30 md:left-[initial] sm:p-3 sm:text-base'
           >
             {showCoats ? 'I don\'t need a coat' : 'Add a coat'}
           </button>
+          </div>
+
           <div className='md:grid md:grid-cols-[repeat(auto-fit,minmax(300px,1fr))] md:gap-4'>
             {Object.entries(items)
               .filter(([category]) => category !== 'COAT' || showCoats)
@@ -203,7 +206,7 @@ const CarouselWrapper = () => {
           {showModal ? (
             <div className='fixed inset-0 z-50 flex items-center justify-center bg-palette-2/50'>
               <div className='w-11/12 max-w-md p-6 rounded-xl bg-palette-3 backdrop-blur-lg border border-white/30 shadow-2xl relative'>
-                <h2 className="text-xl text-palette-2 font-semibold mb-4 text-center">Finish Your Outfit</h2>
+                <h2 className='text-xl text-palette-2 font-semibold mb-4 text-center'>Finish Your Outfit</h2>
                 <form onSubmit={handleCreateOutfit} className='space-y-5'>
                   <div className='bg-white p-4 rounded-xl shadow-sm'>
                     <label

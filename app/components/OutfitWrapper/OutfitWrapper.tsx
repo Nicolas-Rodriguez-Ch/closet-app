@@ -16,16 +16,16 @@ const OutfitWrapper = () => {
   }, [dispatch]);
 
   return (
-    <div className='bg-palette-4/80 min-h-screen w-full py-3 sm:py-6'>
+    <div className='min-h-screen w-full bg-palette-3 px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10'>
       {(status === 'idle' || status === 'loading') && <LoadingComponent />}
       {status === 'failed' && <ErrorComponent />}
       {status === 'succeeded' && (
-        <div className='container mx-auto px-3 sm:px-6'>
+        <div className='mx-auto w-full max-w-7xl'>
           <div
             data-testid='outfits-grid'
-            className={`grid grid-cols-1 sm:grid-cols-2 ${
-              items.length <= 3 ? 'lg:grid-cols-3' : 'lg:grid-cols-4'
-            } gap-3 sm:gap-5`}
+            className={`grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:gap-6 ${
+              items.length <= 3 ? 'xl:grid-cols-3' : 'xl:grid-cols-4'
+            }`}
           >
             {items.map((item) => (
               <OutfitItem key={item.id} item={item} />

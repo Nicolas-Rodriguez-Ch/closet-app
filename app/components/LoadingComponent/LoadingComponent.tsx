@@ -5,11 +5,11 @@ import loading_gif from '../../../public/images/loading_gif.gif';
 const LoadingComponent = () => {
   return (
     <div
-      className='fixed inset-0 z-50 flex items-center justify-center bg-palette-3/80'
+      className='fixed inset-0 z-50 flex items-center justify-center bg-palette-3/80 px-4 backdrop-blur-sm'
       role='alert'
     >
-      <div className='flex flex-col items-center justify-center space-y-4'>
-        <div className='text-palette-2 font-bold text-xl'>
+      <div className='flex w-full max-w-xs flex-col items-center justify-center gap-4 rounded-[1.5rem] border border-white/70 bg-white/85 p-6 text-center shadow-[0_18px_45px_rgba(79,64,54,0.12)]'>
+        <div className='text-xl font-bold text-palette-2'>
           Loading, please wait
         </div>
         <Image

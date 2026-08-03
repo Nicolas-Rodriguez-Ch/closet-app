@@ -26,11 +26,11 @@ export default function RootLayout({
           type='image/x-icon'
         />
       </head>
-      <body>
+      <body className='app-shell'>
         <StoreProvider>
           <ToastNotifier />
           <NavBar />
-          {children}
+          <main className='app-main'>{children}</main>
           <Footer/>
         </StoreProvider>
       </body>
