@@ -119,8 +119,8 @@ describe('OutfitWrapper', () => {
     render(<OutfitWrapper />);
 
     const gridContainer = screen.getByTestId('outfits-grid');
-    expect(gridContainer).toHaveClass('lg:grid-cols-3');
-    expect(gridContainer).not.toHaveClass('lg:grid-cols-4');
+    expect(gridContainer).toHaveClass('xl:grid-cols-3');
+    expect(gridContainer).not.toHaveClass('xl:grid-cols-4');
   });
 
   test('should use 4 columns layout when there are more than 3 outfits', () => {
@@ -139,7 +139,7 @@ describe('OutfitWrapper', () => {
     render(<OutfitWrapper />);
 
     const gridContainer = screen.getByTestId('outfits-grid');
-    expect(gridContainer).toHaveClass('lg:grid-cols-4');
-    expect(gridContainer).not.toHaveClass('lg:grid-cols-3');
+    expect(gridContainer).toHaveClass('xl:grid-cols-4');
+    expect(gridContainer).not.toHaveClass('xl:grid-cols-3');
   });
 });

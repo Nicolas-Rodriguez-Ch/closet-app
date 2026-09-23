@@ -5,7 +5,13 @@ import outfitReducer, {
   createOutfit,
   deleteOutfit,
 } from '../outfitSlice';
-import { OutfitState, IOutfit, CreateOutfitPayload } from '@/lib/types';
+import {
+  OutfitState,
+  IOutfit,
+  IApparel,
+  CreateOutfitPayload,
+} from '@/lib/types';
+import { ApparelTypeEnum } from '@/services/types';
 
 jest.mock('@/public/constants/secrets', () => ({
   API_URL: 'http://mock-api/',
@@ -35,12 +41,21 @@ describe('outfit slice', () => {
     });
   };
 
+  const mockApparel = (id: string, type: ApparelTypeEnum): IApparel => ({
+    id,
+    title: id,
+    pictureURL: `/${id}.jpg`,
+    type,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  });
+
   const mockOutfit: IOutfit = {
     id: 'outfit-1',
     title: 'Casual Day',
-    topID: 'top-1',
-    bottomID: 'bottom-1',
-    shoesID: 'shoes-1',
+    topID: mockApparel('top-1', ApparelTypeEnum.TOP),
+    bottomID: mockApparel('bottom-1', ApparelTypeEnum.BOTTOM),
+    shoesID: mockApparel('shoes-1', ApparelTypeEnum.SHOES),
     tags: ['casual', 'spring'],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -51,9 +66,9 @@ describe('outfit slice', () => {
     {
       id: 'outfit-2',
       title: 'Formal',
-      topID: 'top-2',
-      bottomID: 'bottom-2',
-      shoesID: 'shoes-2',
+      topID: mockApparel('top-2', ApparelTypeEnum.TOP),
+      bottomID: mockApparel('bottom-2', ApparelTypeEnum.BOTTOM),
+      shoesID: mockApparel('shoes-2', ApparelTypeEnum.SHOES),
       tags: ['formal', 'work'],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),

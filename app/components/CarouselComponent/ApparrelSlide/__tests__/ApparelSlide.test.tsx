@@ -5,7 +5,8 @@ import '@testing-library/jest-dom';
 
 jest.mock('next/image', () => ({
   __esModule: true,
-  default: (props: any) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  default: ({ fill, ...props }: any) => {
     return <img data-testid="mock-image" {...props} />;
   },
 }));
@@ -47,10 +48,10 @@ describe('ApparelSlide', () => {
     expect(title).toHaveClass('text-lg font-semibold text-palette-2 text-center');
     
     const imageContainer = screen.getByAltText('Test Apparel').parentElement;
-    expect(imageContainer).toHaveClass('w-full max-w-xs aspect-square relative flex items-center justify-center');
+    expect(imageContainer).toHaveClass('relative flex w-full max-w-sm items-center justify-center overflow-hidden');
     
     const image = screen.getByAltText('Test Apparel');
-    expect(image).toHaveClass('object-contain rounded-lg mb-3');
+    expect(image).toHaveClass('object-contain');
   });
 
   test('passes correct props to Next.js Image component', () => {

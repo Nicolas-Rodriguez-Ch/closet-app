@@ -4,9 +4,9 @@ import { DATABASE_URI } from '@/public/constants/secrets';
 
 jest.mock('mongoose', () => {
   const onMock = jest.fn();
-  const connectionHandlers = {};
+  const connectionHandlers: Record<string, (...args: unknown[]) => void> = {};
 
-  onMock.mockImplementation((event, callback) => {
+  onMock.mockImplementation((event: string, callback: (...args: unknown[]) => void) => {
     connectionHandlers[event] = callback;
     return this;
   });
@@ -18,18 +18,24 @@ jest.mock('mongoose', () => {
     connection: {
       readyState: 0,
       on: onMock,
-      _triggerEvent: (event, ...args) => {
+      _triggerEvent: (event: string, ...args: unknown[]) => {
         if (connectionHandlers[event]) {
           connectionHandlers[event](...args);
         }
       },
-      _setReadyState: (state) => {
-        mongoose.connection.readyState = state;
+      _setReadyState: (state: number) => {
+        (mongoose.connection as { readyState: number }).readyState = state;
       },
     },
     disconnect: jest.fn().mockResolvedValue(undefined),
   };
 });
+
+type MockConnection = typeof mongoose.connection & {
+  _setReadyState: (state: number) => void;
+  _triggerEvent: (event: string, ...args: unknown[]) => void;
+};
+const mockConnection = mongoose.connection as MockConnection;
 
 jest.spyOn(console, 'log').mockImplementation(() => {});
 jest.spyOn(console, 'error').mockImplementation(() => {});
@@ -50,7 +56,7 @@ describe('Database Connection', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mongoose.connection._setReadyState(0);
+    mockConnection._setReadyState(0);
     resetHandlersRegistered();
   });
 
@@ -66,7 +72,7 @@ describe('Database Connection', () => {
   });
 
   it('does not attempt to connect when a connection already exists', async () => {
-    mongoose.connection._setReadyState(1);
+    mockConnection._setReadyState(1);
 
     connectDB();
 
@@ -74,7 +80,7 @@ describe('Database Connection', () => {
   });
 
   it('does not attempt to connect when a connection is being established', async () => {
-    mongoose.connection._setReadyState(2);
+    mockConnection._setReadyState(2);
 
     connectDB();
 
@@ -100,7 +106,7 @@ describe('Database Connection', () => {
   it('handles mongoose connection error events', () => {
     connectDB();
     const testError = new Error('Connection error event');
-    mongoose.connection._triggerEvent('error', testError);
+    mockConnection._triggerEvent('error', testError);
     expect(console.log).toHaveBeenCalledWith(
       'Mongoose connection Error: ',
       testError
@@ -109,7 +115,7 @@ describe('Database Connection', () => {
 
   it('handles mongoose disconnection events', () => {
     connectDB();
-    mongoose.connection._triggerEvent('disconnected');
+    mockConnection._triggerEvent('disconnected');
     expect(console.log).toHaveBeenCalledWith(
       'Mongoose disconnected from database'
     );
