@@ -72,7 +72,7 @@ describe('Footer Component', () => {
     
     const footer = screen.getByRole('contentinfo');
     const containerDiv = footer.firstChild;
-    expect(containerDiv).toHaveClass('container');
+    expect(containerDiv).toHaveClass('max-w-6xl');
     expect(containerDiv).toHaveClass('mx-auto');
     
     const flexContainer = containerDiv?.firstChild;

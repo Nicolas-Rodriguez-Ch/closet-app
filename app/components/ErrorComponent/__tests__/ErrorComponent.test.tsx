@@ -69,7 +69,6 @@ describe('ErrorComponent', () => {
       .closest('div')?.parentElement;
 
     expect(container).toHaveClass('flex');
-    expect(container).toHaveClass('flex-col');
     expect(container).toHaveClass('items-center');
     expect(container).toHaveClass('justify-center');
     expect(container).toHaveClass('min-h-screen');

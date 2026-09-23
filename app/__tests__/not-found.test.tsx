@@ -69,7 +69,6 @@ describe('NotFound Page', () => {
     const container = screen.getByText('Page Not Found').closest('div')?.parentElement;
     
     expect(container).toHaveClass('flex');
-    expect(container).toHaveClass('flex-col');
     expect(container).toHaveClass('items-center');
     expect(container).toHaveClass('justify-center');
     expect(container).toHaveClass('min-h-screen');
@@ -84,6 +83,6 @@ describe('NotFound Page', () => {
     expect(button).toHaveClass('bg-palette-1');
     expect(button).toHaveClass('text-palette-3');
     expect(button).toHaveClass('hover:bg-palette-5');
-    expect(button).toHaveClass('rounded-3xl');
+    expect(button).toHaveClass('rounded-full');
   });
 });

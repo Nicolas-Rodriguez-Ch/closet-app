@@ -4,14 +4,30 @@ import { IOutfit, IApparel } from '@/lib/types';
 
 jest.mock('next/image', () => ({
   __esModule: true,
-  default: ({ src, alt, className }) => (
+  default: ({
+    src,
+    alt,
+    className,
+  }: {
+    src: string;
+    alt: string;
+    className?: string;
+  }) => (
     <img src={src} alt={alt} className={className} data-testid='next-image' />
   ),
 }));
 
 jest.mock('next/link', () => ({
   __esModule: true,
-  default: ({ href, children, className }) => (
+  default: ({
+    href,
+    children,
+    className,
+  }: {
+    href: string;
+    children: React.ReactNode;
+    className?: string;
+  }) => (
     <a href={href} className={className} data-testid='next-link'>
       {children}
     </a>
@@ -88,12 +104,12 @@ describe('OutfitItem', () => {
     render(<OutfitItem item={mockOutfit} />);
 
     const container = screen.getByText('Test Outfit').closest('div');
-    expect(container).toHaveClass('p-3', 'sm:p-4');
+    expect(container).toHaveClass('p-4', 'sm:p-5');
 
     const title = screen.getByText('Test Outfit');
     expect(title).toHaveClass('text-lg', 'sm:text-xl');
 
-    const imageContainers = document.querySelectorAll('.h-36.sm\\:h-48');
+    const imageContainers = document.querySelectorAll('.aspect-square');
     expect(imageContainers.length).toBe(4);
   });
 });
